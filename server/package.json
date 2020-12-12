@@ -1,0 +1,37 @@
+{
+  "name": "quiz",
+  "version": "1.0.0",
+  "description": "A context-based item selection of quiz",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abaar/quIz.git"
+  },
+  "keywords": [
+    "item-selection",
+    "fuzzy",
+    "irt"
+  ],
+  "author": "Akbar Noto",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abaar/quIz/issues"
+  },
+  "homepage": "https://github.com/abaar/quIz#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}

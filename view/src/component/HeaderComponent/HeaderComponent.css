@@ -1,0 +1,14 @@
+.navbar{
+    position:absolute;
+    top:0px;
+    width: 100vw;
+}
+
+.color-white{
+    color:white;
+}
+
+.btn-hover:hover{
+    color:#007bff!important;
+    background-color:white;
+}
