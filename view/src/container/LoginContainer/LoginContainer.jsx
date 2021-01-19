@@ -1,6 +1,7 @@
 import React from 'react';
 import "./LoginContainer.css"
 import LoginComponent from "../../component/LoginComponent/LoginComponent"
+import NotificationComponent from "../../component/NotificationComponent/NotificationComponent"
 import FlexContainer from "../FlexContainer";
 import axios from 'axios';
 
@@ -16,6 +17,11 @@ class LoginContainer extends React.Component{
                 status : false,
                 message : null,
             },
+            notif   : {
+                status : false,
+                type  : null,
+                message : null,
+            }
         }
     }
     
@@ -24,7 +30,6 @@ class LoginContainer extends React.Component{
         {},
         {withCredentials:true})
         .then((res)=>{
-            console.log(res.data)
             this.props.onAuth(true,res.data.data)
             // this.setState({
             //     loading : false
@@ -33,7 +38,22 @@ class LoginContainer extends React.Component{
             this.setState({
                 loading:false,
             })
-            alert("Sesi Anda telah habis, silahkan login kembali!")
+            // alert("Sesi Anda telah habis, silahkan login kembali!")
+            this.setState({
+                notif :{
+                    status : true,
+                    type : "alert-shown alert-error",
+                    message : "Sesi Anda telah habis, silahkan login kembali!"
+                }
+            })
+
+            setTimeout(()=>{
+                this.setState({
+                    notif :{
+                        status : false,
+                    }
+                }) 
+            }, 3000)
         })
     }
 
@@ -49,12 +69,14 @@ class LoginContainer extends React.Component{
             },
         };
 
-        console.log(this.state.loading)
         return (
             <FlexContainer>
                 {
                  (this.state.loading)? "Loading...":<LoginComponent onSubmitHandler={this.onSubmitHandler} naming={naming} onChangeHandler={this.onChangeHandler} failed={this.state.failed}/>
                 }
+            
+                <NotificationComponent message={this.state.notif.message} type={this.state.notif.type} status={this.state.notif.status}></NotificationComponent>
+                
             </FlexContainer>
         );
     }

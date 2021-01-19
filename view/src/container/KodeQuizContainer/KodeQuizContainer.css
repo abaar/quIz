@@ -10,3 +10,61 @@
 .border-login{
     border:1px solid #cecece;
 }
+
+.tabs{
+    display:flex;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.tabs > div > p:hover{
+    background-color:  #007bff!important;
+    color:white;
+    border-bottom: 2px solid #007bff!important;
+}
+
+.tabs > div > p{
+    cursor: pointer;
+    padding:5px;
+}
+
+.tabs > div > p.active {
+    border-bottom: 2px solid #007bff!important;
+}
+
+.flex-100{
+    flex-basis: 100%;
+}
+
+
+.flex-90{
+    min-width: 0;
+    flex-basis: 90%;
+}
+
+.flex-10{
+    flex-basis: 10%;
+}
+
+.search-input{
+    width: 100%;
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.search-input:focus{
+    color:#495057;
+    background-color:#fff;
+    border-color:#80bdff;
+    outline:0;
+    box-shadow:0 0 0 .2rem rgba(0,123,255,.25)
+}

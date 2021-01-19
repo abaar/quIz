@@ -1,0 +1,24 @@
+.notification{
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px;
+    border: 0.5px solid;
+    cursor: pointer;
+}
+
+.alert-shown{
+    opacity: 1;
+    transition: all 250ms linear;
+}
+
+.alert-hidden{
+    opacity: 0;
+    transition: all 250ms linear;
+}
+
+.alert-error{
+    background-color: #f8d7da;
+    border-color:#f5c6cb;
+    color:#721c24;
+}

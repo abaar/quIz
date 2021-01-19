@@ -1,0 +1,24 @@
+.q-btn{
+    background-color: white;
+    border: 1px solid #007bff;
+    color: #007bff;
+    font-weight: bold;
+    margin:5px;
+    padding:10px 15px;
+}
+
+.q-btn:hover{
+    background-color: #007bff;
+    color: white;
+}
+
+.q-btn.checked{
+    background-color : green;
+    color:white;
+    border-color: green;
+}
+
+.q-btn.active{
+    background-color: #007bff;
+    color: white; 
+}

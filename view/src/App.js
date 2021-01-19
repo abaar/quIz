@@ -9,7 +9,7 @@ import {
 import LoginContainer from "./container/LoginContainer/LoginContainer";
 import KodeQuizContainer from "./container/KodeQuizContainer/KodeQuizContainer";
 import PanduanContainer from "./container/PanduanContainer/PanduanContainer";
-
+import QuizContainer from "./container/QuizContainer/QuizContainer";
 import {setAccesstoken, getAccessToken} from "./auth.js";
 
 class App extends React.Component {
@@ -17,8 +17,8 @@ class App extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      soal     : {
-        status  : false,
+      ujian     : {
+        status  : -1,
         data    : null,
       },
       fakeAuth : {
@@ -31,24 +31,43 @@ class App extends React.Component {
     }
   }
 
+  componentDidUpdate(){
+    console.log(this.state)
+  }
+
   render(){
+
+    const loginComponent    = <LoginContainer onAuth={this.onAuthHandler} onTestStart={this.onTesInput} />;
+    const loginRedirect     = <Redirect to={{pathname: '/'}} />;
+    const kodeComponent     = <KodeQuizContainer onAuth={this.onAuthHandler} onTestStart={this.onTesInput}  fakeAuth={this.state.fakeAuth}/>;
+    const kodeRedirect      = <Redirect to={{pathname: '/daftar-ujian'}}/>;
+    const panduanComponent  = <PanduanContainer  onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth} startTest={this.startTest} ></PanduanContainer>
+    const panduanRedirect   = <Redirect to={{ pathname: '/ujian/panduan' }}/>;
+    const quizComponent     = <QuizContainer onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth}></QuizContainer>
+    const quizRedirect      = <Redirect to={{ pathname: "/ujian/live" }}/>
+
     return (
       <Router>
         <div className="App">
           <Switch>
             <Route exact path="/">
               {
-               (!this.state.fakeAuth.auth)?<LoginContainer onAuth={this.onAuthHandler} />:<Redirect to={{pathname: '/kode-test'}} />
+               (!this.state.fakeAuth.auth)?loginComponent:kodeRedirect
               }
             </Route>
-            <Route exact path="/kode-test">
+            <Route exact path="/daftar-ujian">
               {
-                (!this.state.fakeAuth.auth)?<Redirect to={{pathname: '/'}} />:<KodeQuizContainer onAuth={this.onAuthHandler} onKodeInput={this.onTesInput}  fakeAuth={this.state.fakeAuth}/>
+                (!this.state.fakeAuth.auth)?loginRedirect:((this.state.ujian.status === -1)?kodeComponent:panduanRedirect)
               }
             </Route>
-            <Route exact path="/test">
+            <Route exact path="/ujian/panduan">
               {
-                (!this.state.fakeAuth.auth)?<Redirect to={{pathname: '/'}} />: (!this.state.soal.status)?<Redirect to={{pathname: '/kode-test'}} />:<PanduanContainer onAuth={this.onAuthHandler}/>
+                (!this.state.fakeAuth.auth)?loginRedirect:((this.state.ujian.status === -1)?kodeRedirect:(this.state.ujian.status === 1)?quizRedirect:panduanComponent)
+              }
+            </Route>
+            <Route exact path="/ujian/live">
+              {
+                (!this.state.fakeAuth.auth)?loginRedirect:((this.state.ujian.status === -1)?kodeRedirect:(this.state.ujian.status === 1)?quizComponent:panduanRedirect)
               }
             </Route>
           </Switch>
@@ -72,13 +91,31 @@ class App extends React.Component {
     setAccesstoken(data? data.token:"")
   }
 
-  onTesInput = (status, data) => {
+  onTesInput = (statusx, data) => {
     this.setState({
-      soal : {
-        status  : status,
-        data    : data
-      }
+      ujian : {
+        status  : statusx,
+        data    : data,
+      },
     })
+  }
+  
+  startTest = (status) =>{
+    if(status === 1){
+      this.setState({
+        ujian : {
+          status : 1,
+          data : this.state.ujian.data
+        }
+      })
+    }else{
+      this.setState({
+        ujian : {
+          status : -1,
+          data : null
+        }
+      })
+    }
   }
 }
 

@@ -26,10 +26,10 @@ class PanduanContainer extends React.Component{
                         <br/>
                         <div className="row">
                             <div className="col-md-6">
-                                <button className="btn btn-secondary">Kembali</button>
+                                <button className="btn btn-secondary" onClick={() => {this.props.startTest(-1)}}>Kembali</button>
                             </div>
                             <div className="col-md-6" style={{ textAlign:'right' }}>
-                                <button className="btn btn-primary">Mulai Kerjakan</button>
+                                <button className="btn btn-primary"  onClick={() => {this.props.startTest(1)}}>Mulai Kerjakan</button>
                             </div>
                         </div>
                     </div>
