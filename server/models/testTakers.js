@@ -1,5 +1,5 @@
 module.exports = class TestTaker{
-    constructor(id = null , test_id, user_id , start , end, score = 0){
+    constructor(id = null , test_id, user_id , start = null, end = null, score = 0){
         this.id         = id
         this.test_id    = test_id
         this.user_id    = user_id

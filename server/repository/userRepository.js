@@ -44,16 +44,18 @@ exports.saveUser = (user)=>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
             if(err) throw(err);
-            let sql = "INSERT INTO USERS(name,username, password) VALUES(?,?,?)";
-            connection.query(sql, [user.name,user.username, bcrypt.hash(user.password,10)],(err, result)=>{
-                if(err) {
-                    console.log(err)
+            let sql = "INSERT INTO USERS(name, username, password, subclass_id, class_id, school_id) VALUES(?,?,?,?,?,?)";
+            bcrypt.hash(user.password,10, (err,hashedPassword)=>{
+                if(err){
                     throw(err)
                 }
-
-                console.log(`Success insert ${user.name}`);
-                connection.release()
-                return resolve(true);
+                connection.query(sql, [user.name,user.username, hashedPassword, user.subclass_id, user.class_id, user.school_id],(err, result)=>{
+                    if(err) {
+                        throw(err)
+                    }
+                    connection.release()
+                    return resolve(true);
+                });
             });
         });
     });

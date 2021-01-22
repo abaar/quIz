@@ -11,6 +11,7 @@ import KodeQuizContainer from "./container/KodeQuizContainer/KodeQuizContainer";
 import PanduanContainer from "./container/PanduanContainer/PanduanContainer";
 import QuizContainer from "./container/QuizContainer/QuizContainer";
 import {setAccesstoken, getAccessToken} from "./auth.js";
+import axios from "axios";
 
 class App extends React.Component {
 
@@ -32,7 +33,6 @@ class App extends React.Component {
   }
 
   componentDidUpdate(){
-    console.log(this.state)
   }
 
   render(){
@@ -41,9 +41,9 @@ class App extends React.Component {
     const loginRedirect     = <Redirect to={{pathname: '/'}} />;
     const kodeComponent     = <KodeQuizContainer onAuth={this.onAuthHandler} onTestStart={this.onTesInput}  fakeAuth={this.state.fakeAuth}/>;
     const kodeRedirect      = <Redirect to={{pathname: '/daftar-ujian'}}/>;
-    const panduanComponent  = <PanduanContainer  onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth} startTest={this.startTest} ></PanduanContainer>
+    const panduanComponent  = <PanduanContainer  onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth} details={this.state.ujian} startTest={this.startTest} ></PanduanContainer>
     const panduanRedirect   = <Redirect to={{ pathname: '/ujian/panduan' }}/>;
-    const quizComponent     = <QuizContainer onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth}></QuizContainer>
+    const quizComponent     = <QuizContainer onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth} quiz={this.state.ujian}></QuizContainer>
     const quizRedirect      = <Redirect to={{ pathname: "/ujian/live" }}/>
 
     return (
@@ -100,19 +100,19 @@ class App extends React.Component {
     })
   }
   
-  startTest = (status) =>{
+  startTest = (status, details = null) =>{
     if(status === 1){
       this.setState({
         ujian : {
           status : 1,
-          data : this.state.ujian.data
+          data : details
         }
       })
     }else{
       this.setState({
         ujian : {
           status : -1,
-          data : null
+          data : details
         }
       })
     }

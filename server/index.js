@@ -9,6 +9,7 @@ require('dotenv').config()
 // routes
 const admins  = require("./modules/admin/routes/index.js");
 const auth    = require("./modules/auth/routes.js");
+const quiz    = require("./modules/quiz/routes/index.js")
 
 app.use(cors({credentials: true}))
 app.use(cParser())
@@ -17,6 +18,7 @@ app.use(bParser.urlencoded({extended:false}));
 
 app.use("/admin",admins);
 app.use("/auth", auth);
+app.use("/quiz", quiz)
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)

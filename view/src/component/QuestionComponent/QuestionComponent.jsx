@@ -8,6 +8,7 @@ class QuestionComponent extends React.Component {
         const answers = [];
         for (let i =0 ; i < this.props.details.answers.length ; ++i){
                 answers.push(<AnswerComponent 
+                    key={i}
                     qid={this.props.details.id} 
                     label={this.props.details.answers[i].label} 
                     id={this.props.details.answers[i].id}

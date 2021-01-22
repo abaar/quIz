@@ -11,7 +11,5 @@ exports.indexData = (req, res)=>{
             res.send(JSON.stringify(result))
         });
     }catch(err){
-        console.log("error")
-        console.log(err)
     }
 }

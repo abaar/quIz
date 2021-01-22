@@ -16,7 +16,7 @@ class AnswerComponent extends React.Component {
                 <label  className="answers-choice" htmlFor={"answersof"+this.props.qid} onClick={()=>{
                     this.props.setChecked(this.props.id)
                 }}>
-                    <input type="radio" name={"answersof"+this.props.qid} value={this.props.id} checked={this.props.isChecked}/> {this.props.label}
+                    <input type="radio" name={"answersof"+this.props.qid} value={this.props.id} checked={this.props.isChecked} readOnly/> {this.props.label}
                 </label>
                 <br/>
             </span>

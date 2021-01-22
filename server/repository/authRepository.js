@@ -1,7 +1,6 @@
 const db        = require("../config/db.js")
 const User      = require("../models/users.js")
 const bcrypt    = require('bcryptjs');
-const env       = require("../config/env.js")
 
 exports.getByUsername = (username) =>{
     return new Promise((resolve, reject)=>{

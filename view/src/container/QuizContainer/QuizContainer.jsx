@@ -8,118 +8,33 @@ import QNavComponent from "../../component/QNavComponent/QNavComponent";
 class QuizContainer extends React.Component{
     constructor(props){
         super(props)
+        let current;
+        let soals = []
+        for(let i = 0 ; i < this.props.quiz.data.length; ++i){
+            let iter    = this.props.quiz.data[i]
+            let holder  = {
+                id          : iter.id,
+                index       : i,
+                question    : iter.question,
+                checked     : iter.test_taker_answer,
+                answers     : [],
+            }
+            for(let j = 0 ; j < iter.answers.length; ++j){
+                let jter = iter.answers[j]
+                holder.answers.push({
+                    id      : jter.id,
+                    label   : jter.label
+                })
+            }
+
+            if(i === 0){
+                current = holder
+            }
+            soals.push(holder)
+        }
         this.state = {
-            current:{
-                id:1,
-                index : 0,
-                question:"1+1 = ",
-                checked : null,
-                answers : [
-                    {
-                        id:"1",
-                        label : "2",
-                    },
-                    {
-                        id:"2",
-                        label : "1",
-                    },
-                    {
-                        id:"3",
-                        label : "3",
-                    },
-                    {
-                        id:"4",
-                        label : "2.5",
-                    },
-                    {
-                        id:"5",
-                        label : "5",
-                    },
-                ]
-            },
-            soals : [
-                {
-                    id : 1,
-                    question:"1+1 = ",
-                    checked : null,
-                    answers : [
-                        {
-                            id:"1",
-                            label : "2",
-                        },
-                        {
-                            id:"2",
-                            label : "1",
-                        },
-                        {
-                            id:"3",
-                            label : "3",
-                        },
-                        {
-                            id:"4",
-                            label : "2.5",
-                        },
-                        {
-                            id:"5",
-                            label : "5",
-                        },
-                    ]
-                },
-                {
-                    id : 2,
-                    question:"2+2 = ",
-                    checked : null,
-                    answers : [
-                        {
-                            id:"6",
-                            label : "2",
-                        },
-                        {
-                            id:"7",
-                            label : "1",
-                        },
-                        {
-                            id:"8",
-                            label : "3",
-                        },
-                        {
-                            id:"9",
-                            label : "2.5",
-                        },
-                        {
-                            id:"10",
-                            label : "5",
-                        },
-                    ]
-                },
-                {
-                    id : 3,
-                    question:"4+4 = ",
-                    checked : null,
-                    answers : [
-                        {
-                            id:"11",
-                            label : "2",
-                        },
-                        {
-                            id:"12",
-                            label : "1",
-                        },
-                        {
-                            id:"13",
-                            label : "3",
-                        },
-                        {
-                            id:"14",
-                            label : "2.5",
-                        },
-                        {
-                            id:"15",
-                            label : "5",
-                        },
-                    ]
-                },
-            ],
+            current:current,
+            soals : soals,
             sidenav : {
                 status: false,
             }
@@ -133,7 +48,7 @@ class QuizContainer extends React.Component{
         const qnav = [];
         for(let i = 0; i< this.state.soals.length ; ++i){
             qnav.push(                                
-                <QNavComponent number={i+1} index={i} checked={this.state.soals[i].checked != null} active={(this.state.current.index === i)} setQActive={this.moveToQuestion}>
+                <QNavComponent number={i+1} key={i} index={i} checked={this.state.soals[i].checked != null} active={(this.state.current.index === i)} setQActive={this.moveToQuestion}>
                 </QNavComponent>
             )
         }

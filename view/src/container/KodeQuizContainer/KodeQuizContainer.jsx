@@ -1,16 +1,12 @@
 import React from "react";
+import Moment from "react-moment";
+import 'moment/locale/id';
+
 import "./KodeQuizContainer.css";
 import Container from "../Container";
 import HeaderComponent from "../../component/HeaderComponent/HeaderComponent";
 import UpcomingQuizComponent from "../../component/UpcomingQuizComponent/UpcomingQuizComponent";
 import Axios from "axios";
-
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Redirect,
-  } from "react-router-dom";
 
 class KodeQuizContainer extends React.Component{
 
@@ -18,40 +14,84 @@ class KodeQuizContainer extends React.Component{
         super(props)
         this.state = {
             list : true,
+            upcomingquiz: [],
+            upcomingquizdata :[],
+            loading:true,
         }
     }
 
     componentDidMount(){
-        
-        const datas = [
-            {
-                id    : "1",
-                type  : "conventionalx",
-                kode  : "A2X2K",
-                title : "Matematika",
-                date  : "10.00 - 12.00 WIB | Selasa, 26 Januari 2021",
-                note  : "Materi Pecahan dan Perkalian",
-            },
-            {
-                id    : "2",
-                type  : "conventional",
-                kode  : "A2X2J",
-                title : "Matematika",
-                date  : "12.30 - 15.00 WIB | Selasa, 26 Januari 2021",
-                note  : "Materi Bilangan Bulat",
+        const datas = []
+        Axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+        Axios.get("/quiz/test",{
+            params:{
+                id:this.props.fakeAuth.data.user.id,
             }
-        ];
+        },{withCredentials:true}).then((res)=>{
+            if(res.data.status){
+                for(let i = 0 ; i < res.data.data.length; ++i){
+                    let {
+                        id, code, type, title, start, end, description, date, takers
+                    } = res.data.data[i]
 
-        let components = [];
+                    let date_str, startdate, enddate, curdate, opentest;
+                    if(date !== null){
+                        date_str  = <span> {start.substr(0,start.length-3)} - {end.substr(0,end.length-3)} WIB | <Moment locale="id" format="dddd, DD MMMM YYYY">{date}</Moment></span> 
+                        date      = new Date(date)
+                        
+                        let day       = date.getDate()
+                        if(day<10){
+                            day   = "0"+day
+                        }
+                        let month     = date.getMonth()+1
+                        if(month<10){
+                            month = "0"+month
+                        }
+                        let year      = date.getFullYear()
+                        date          = year+"-"+month+"-"+day;
 
-        for (let i =0 ; i < datas.length ; ++i){
-            components.push(<UpcomingQuizComponent key={datas[i].id} onStartHandler={this.startUjian} details={datas[i]}></UpcomingQuizComponent>)
-        }
+                        startdate = new Date(`${date} ${start}`)
+                        enddate   = new Date(`${date} ${end}`)
+                        curdate   = new Date()
+                        opentest  = (startdate <= curdate && curdate <= enddate)
+                    }else{
+                        date_str  = "Tidak dibatasi waktu"
+                        opentest  = 1;
+                    }
 
-        this.setState({
-            upcomingquizdata : datas,
-            upcomingquiz : components,
-        });
+                    datas.push({
+                        id      :id,
+                        type    : (type === 0)? "conventional":"adaptive",
+                        kode    : code,
+                        title   : title,
+                        date    : date_str,
+                        note    : description,
+                        open    : opentest,
+                        time    : {
+                            start : startdate,
+                            end   : enddate 
+                        },
+                        taken   : (takers.length!== 0)
+                    })
+                }
+                
+                let components = [];
+
+                for (let i =0 ; i < datas.length ; ++i){
+                    components.push(<UpcomingQuizComponent key={datas[i].id} onContinueHandler={this.continueUjian} onStartHandler={this.startUjian} details={datas[i]}></UpcomingQuizComponent>)
+                }
+        
+                this.setState({
+                    upcomingquizdata : datas,
+                    upcomingquiz : components,
+                    loading:false,
+                });
+            }else{
+                alert("aiyasss")
+            }
+        }).catch((err)=>{
+            alert(err)
+        })
     }
 
     searchUjian = (event) => {
@@ -68,7 +108,7 @@ class KodeQuizContainer extends React.Component{
 
         this.setState({
             upcomingquiz : components,
-        });
+        });        
     }
 
     render(){
@@ -76,7 +116,7 @@ class KodeQuizContainer extends React.Component{
         const list =  <div className="col-sm-12 col-md-12">
                             <input type="text" className="search-input" placeholder="Cari Kode / Mata Pelajaran / Hari" onChange={this.searchUjian}/>
                             <br/>
-                            {this.state.upcomingquiz}
+                            {this.state.upcomingquiz.length === 0? (this.state.loading? <UpcomingQuizComponent loading={true}></UpcomingQuizComponent> :<UpcomingQuizComponent empty={true}></UpcomingQuizComponent>):this.state.upcomingquiz }
                         </div>
                     ;
 
@@ -135,9 +175,23 @@ class KodeQuizContainer extends React.Component{
         })
     }
 
-    startUjian = (id, kode) =>{
-        // fetch data dulu baru start
-        this.props.onTestStart(0,[])
+    startUjian = (id, details) =>{
+        this.props.onTestStart(0,details)
+    }
+
+    continueUjian = (id, details) =>{
+        Axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+        Axios.post("/quiz/test/continue",{
+            test_id : details.id
+        },{withCredentials:true}).then((res)=>{
+            if(res.data.status){
+               this.props.onTestStart(1, res.data.data.questions)
+            }else{
+                alert(res.data.message)
+            }
+        }).catch((err)=>{
+            alert(err)
+        })
     }
 }
 

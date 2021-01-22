@@ -7,5 +7,4 @@ const db = mysql.createPool({
     password        : "12345678",
     database        : "akbar_play_node"
 })
-
 module.exports = db

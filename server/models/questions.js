@@ -1,10 +1,12 @@
 module.exports = class Question{
-    constructor(id = null , question, true_count = 0 , false_count = 0){
+    constructor(id = null , question, true_count = 0 , false_count = 0, tta = null){
         this.id          = id
         this.question    = question
         this.true_count  = true_count
         this.false_count = false_count
-    
+
+        this.test_taker_answer = tta
+
         this.algorithms   = []
         this.answers      = []
         this.specificCompetencies = []

@@ -38,7 +38,6 @@ class LoginContainer extends React.Component{
             this.setState({
                 loading:false,
             })
-            // alert("Sesi Anda telah habis, silahkan login kembali!")
             this.setState({
                 notif :{
                     status : true,
@@ -99,11 +98,12 @@ class LoginContainer extends React.Component{
         }).then((res)=>{
 
             if(res.data.status){
-                let {id, name, username} = res.data.data
+                let {id, name, username , token} = res.data.data
                 let user = {
                     id : id,
                     name : name,
-                    username : username
+                    username : username,
+                    token : token,
                 };
 
                 this.props.onAuth(true, user);
