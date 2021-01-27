@@ -1,0 +1,17 @@
+.notification-submitting{
+    padding: 5px;
+    color: white;
+    border-radius: 5px;
+}
+
+.loading{
+    background-color: #f8ac59;
+}
+
+.success{
+    background-color: #1ab394;
+}
+
+.error{
+    background-color: #ed5565;
+}

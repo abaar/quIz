@@ -1,3 +1,6 @@
+body{
+}
+
 .sidenav-q-container{
     position: fixed;
     /* top : 8rem; */
@@ -17,7 +20,7 @@
 .sidenav-q-container.active{
     left:0;
     background-color: white;
-    border: 1px solid #007bff;
+    border: 1px solid #013880;
 }
 
 .sidenav-q-body{
@@ -33,7 +36,7 @@
     left: 0;
     padding: 50px 10px;
     background-color: white;
-    border: 1px solid #007bff;
+    border: 1px solid #013880;
     border-left: none;
     cursor: pointer;
 }
@@ -49,7 +52,7 @@
 }
 
 .sidenav-q-slider span{
-    color: #007bff; 
+    color: #013880; 
 }
 
 .sidenav-q-slider.active{
@@ -60,7 +63,7 @@
 .q-body-container{
     width: 75vw;
     margin: 0px 30%;
-    padding: 5px;
+    padding: 15px;
     border: 1px solid black;
 }
 
@@ -78,14 +81,14 @@
 }
 
 .q-nav-btn{
-    background-color: #007bff;
+    background-color: #013880;
     color: white;
 }
 
 .q-nav-btn:not(.disabled):hover {
     background-color: white;
-    color:#007bff;
-    border: 1px solid #007bff;
+    color:#013880;
+    border: 1px solid #013880;
 }
 
 .q-nav-btn.disabled:hover{
@@ -95,6 +98,21 @@
 
 #q-nav-next{
     float: right;
+}
+
+#q-nav-finish{
+    float: right;
+}
+
+
+.q-header{
+    float:right
+}
+
+.q-header-timer{
+    padding: 5px;
+    background-color: red;
+    color:white
 }
 
 /* Extra small devices (phones, 600px and down) */

@@ -97,7 +97,7 @@ class PanduanContainer extends React.Component{
             test_id : this.props.details.data.id
         },{withCredentials:true}).then((res)=>{
             if(res.data.status){
-               this.props.startTest(1, res.data.data.questions)
+               this.props.startTest(1, res.data.data)
             }else{
                 alert(res.data.message)
             }

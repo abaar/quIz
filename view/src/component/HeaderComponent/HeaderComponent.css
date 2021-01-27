@@ -8,8 +8,12 @@
     color:white;
 }
 
+.head-primary{
+    background-color: #013880;
+}
+
 .btn-hover:hover{
-    color:#007bff!important;
+    color:#013880!important;
     background-color:white;
 }
 
@@ -38,7 +42,7 @@
 }
 
 .navigation-sm-buttons > li > p{
-    border-bottom: 2px solid #007bff;
+    border-bottom: 2px solid #013880;
 }
 
 .navigation-sm-buttons > li:first-child{
@@ -46,7 +50,7 @@
 }
 
 .navigation-sm-buttons > li:not(:first-child):hover{
-    background-color:#007bff;
+    background-color:#013880;
     color:white;
 }
 

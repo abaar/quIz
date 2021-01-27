@@ -43,7 +43,7 @@ class App extends React.Component {
     const kodeRedirect      = <Redirect to={{pathname: '/daftar-ujian'}}/>;
     const panduanComponent  = <PanduanContainer  onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth} details={this.state.ujian} startTest={this.startTest} ></PanduanContainer>
     const panduanRedirect   = <Redirect to={{ pathname: '/ujian/panduan' }}/>;
-    const quizComponent     = <QuizContainer onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth} quiz={this.state.ujian}></QuizContainer>
+    const quizComponent     = <QuizContainer onAuth={this.onAuthHandler}  fakeAuth={this.state.fakeAuth} quiz={this.state.ujian}  startTest={this.startTest} ></QuizContainer>
     const quizRedirect      = <Redirect to={{ pathname: "/ujian/live" }}/>
 
     return (

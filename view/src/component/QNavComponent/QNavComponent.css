@@ -1,24 +1,36 @@
 .q-btn{
     background-color: white;
-    border: 1px solid #007bff;
-    color: #007bff;
+    border: 1px solid #013880;
+    color: #013880;
     font-weight: bold;
     margin:5px;
     padding:10px 15px;
 }
 
 .q-btn:hover{
-    background-color: #007bff;
+    background-color: #01295e;
     color: white;
 }
 
 .q-btn.checked{
-    background-color : green;
+    background-color : #013880;
     color:white;
-    border-color: green;
+    border-color: #013880;
+}
+
+.q-btn.checked:hover{
+    background-color: #01295e;
+    color: white;
 }
 
 .q-btn.active{
-    background-color: #007bff;
-    color: white; 
+    background-color: #ffc410;
+    border-color: #ffc410;
+    color: #013880; 
+}
+
+.q-btn.active:hover{
+    background-color: #01295e;
+    border-color: #01295e;
+    color: white;
 }

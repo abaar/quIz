@@ -18,9 +18,9 @@
 }
 
 .tabs > div > p:hover{
-    background-color:  #007bff!important;
+    background-color:  #013880!important;
     color:white;
-    border-bottom: 2px solid #007bff!important;
+    border-bottom: 2px solid #013880!important;
 }
 
 .tabs > div > p{
@@ -29,7 +29,7 @@
 }
 
 .tabs > div > p.active {
-    border-bottom: 2px solid #007bff!important;
+    border-bottom: 2px solid #013880!important;
 }
 
 .flex-100{

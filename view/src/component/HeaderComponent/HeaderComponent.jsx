@@ -12,7 +12,7 @@ class HeaderComponent extends React.Component{
     render(){
         return (
             <span>
-                <nav className="navbar bg-primary">
+                <nav className="navbar head-primary" sty>
                     <div>
                     <span className="navbar-text color-white" >
                         {this.props.fakeAuth.data.user.name}

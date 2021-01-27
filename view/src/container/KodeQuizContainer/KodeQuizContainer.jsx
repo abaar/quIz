@@ -185,7 +185,7 @@ class KodeQuizContainer extends React.Component{
             test_id : details.id
         },{withCredentials:true}).then((res)=>{
             if(res.data.status){
-               this.props.onTestStart(1, res.data.data.questions)
+               this.props.onTestStart(1, res.data.data)
             }else{
                 alert(res.data.message)
             }
