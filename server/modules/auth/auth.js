@@ -35,7 +35,7 @@ exports.attempt = (req, res)=>{
             }else{
                 res.send({
                     status  : false,
-                    message : "Username tidak ditemukan x!",
+                    message : "Username / Pasword salah!",
                 });
             }
         })
