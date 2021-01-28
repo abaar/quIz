@@ -4,6 +4,7 @@ import LoginComponent from "../../component/LoginComponent/LoginComponent"
 import NotificationComponent from "../../component/NotificationComponent/NotificationComponent"
 import FlexContainer from "../FlexContainer";
 import axios from 'axios';
+import FooterComponent from "../../component/FooterComponent/FooterComponent"
 
 class LoginContainer extends React.Component{
 
@@ -69,11 +70,11 @@ class LoginContainer extends React.Component{
         };
 
         return (
-            <FlexContainer>
+            <FlexContainer className="bg-main">
                 {
                  (this.state.loading)? "Loading...":<LoginComponent onSubmitHandler={this.onSubmitHandler} naming={naming} onChangeHandler={this.onChangeHandler} failed={this.state.failed}/>
                 }
-            
+                <FooterComponent></FooterComponent>
                 <NotificationComponent message={this.state.notif.message} type={this.state.notif.type} status={this.state.notif.status}></NotificationComponent>
                 
             </FlexContainer>
