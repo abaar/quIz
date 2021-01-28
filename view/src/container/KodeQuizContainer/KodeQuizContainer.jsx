@@ -8,6 +8,11 @@ import HeaderComponent from "../../component/HeaderComponent/HeaderComponent";
 import UpcomingQuizComponent from "../../component/UpcomingQuizComponent/UpcomingQuizComponent";
 import Axios from "axios";
 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+const swalinstance = withReactContent(Swal)
+
+
 class KodeQuizContainer extends React.Component{
 
     constructor(props){
@@ -58,7 +63,6 @@ class KodeQuizContainer extends React.Component{
                         date_str  = "Tidak dibatasi waktu"
                         opentest  = 1;
                     }
-
                     datas.push({
                         id      :id,
                         type    : (type === 0)? "conventional":"adaptive",
@@ -71,26 +75,33 @@ class KodeQuizContainer extends React.Component{
                             start : startdate,
                             end   : enddate 
                         },
-                        taken   : (takers.length!== 0)
+                        cont    : (takers.length && takers[0].end  == null),
+                        taken   : (takers.length && takers[0].end !== null),
+                        score   : (takers.length)? takers[0].score:0
                     })
                 }
                 
-                let components = [];
-
-                for (let i =0 ; i < datas.length ; ++i){
-                    components.push(<UpcomingQuizComponent key={datas[i].id} onContinueHandler={this.continueUjian} onStartHandler={this.startUjian} details={datas[i]}></UpcomingQuizComponent>)
-                }
         
                 this.setState({
                     upcomingquizdata : datas,
-                    upcomingquiz : components,
+                    upcomingquiz : datas,
                     loading:false,
                 });
             }else{
-                alert("aiyasss")
+                swalinstance.fire({
+                    title : <p>Terjadi Kesalahan</p>,
+                    icon  : "error",
+                    text  : "Terjadi kesalahan, mohon hubungi proktor / pengawas ujian!",
+                    confirmButtonColor: '#d33',
+                })
             }
         }).catch((err)=>{
-            alert(err)
+            swalinstance.fire({
+                title : <p>Terjadi Kesalahan</p>,
+                icon  : "error",
+                text  : "Terjadi kesalahan, mohon hubungi proktor / pengawas ujian!",
+                confirmButtonColor: '#d33',
+            })
         })
     }
 
@@ -99,10 +110,10 @@ class KodeQuizContainer extends React.Component{
         let components = [];
 
         for (let i =0 ; i < this.state.upcomingquizdata.length ; ++i){
-            let {kode, title, date} = this.state.upcomingquizdata[i]
+            let {kode, title} = this.state.upcomingquizdata[i]
 
-            if(kode.toLowerCase().includes(value) || title.toLowerCase().includes(value) || date.toLowerCase().includes(value,16)){
-                components.push(<UpcomingQuizComponent key={i}  details={this.state.upcomingquizdata[i]}></UpcomingQuizComponent>)
+            if(kode.toLowerCase().includes(value) || title.toLowerCase().includes(value)){
+                components.push(this.state.upcomingquizdata[i])
             }
         }
 
@@ -112,11 +123,16 @@ class KodeQuizContainer extends React.Component{
     }
 
     render(){
+        let components = [];
+
+        for (let i =0 ; i < this.state.upcomingquiz.length ; ++i){
+            components.push(<UpcomingQuizComponent key={this.state.upcomingquiz[i].id} onContinueHandler={this.continueUjian} onStartHandler={this.startUjian} details={this.state.upcomingquiz[i]} starting={false}></UpcomingQuizComponent>)
+        }
 
         const list =  <div className="col-sm-12 col-md-12">
-                            <input type="text" className="search-input" placeholder="Cari Kode / Mata Pelajaran / Hari" onChange={this.searchUjian}/>
+                            <input type="text" className="search-input" placeholder="Cari Kode / Mata Pelajaran" onChange={this.searchUjian}/>
                             <br/>
-                            {this.state.upcomingquiz.length === 0? (this.state.loading? <UpcomingQuizComponent loading={true}></UpcomingQuizComponent> :<UpcomingQuizComponent empty={true}></UpcomingQuizComponent>):this.state.upcomingquiz }
+                            {components.length === 0? (this.state.loading? <UpcomingQuizComponent loading={true}></UpcomingQuizComponent> :<UpcomingQuizComponent empty={true}></UpcomingQuizComponent>):components }
                         </div>
                     ;
 
@@ -185,12 +201,41 @@ class KodeQuizContainer extends React.Component{
             test_id : details.id
         },{withCredentials:true}).then((res)=>{
             if(res.data.status){
-               this.props.onTestStart(1, res.data.data)
+                if(res.data.data.questions.length){
+                    this.props.onTestStart(1, res.data.data)
+                }else{
+                    const data = this.state.upcomingquizdata
+
+                    this.setState({
+                        upcomingquiz:[]
+                    },()=>{
+                        this.setState({
+                            upcomingquiz : data
+                        })
+                    })
+
+                    swalinstance.fire({
+                        title : <p>Gagal</p>,
+                        icon  : "error",
+                        text  : "Ujian ini belum soalnya, mohon hubungi proktor / pengawas ujian!",
+                        confirmButtonColor: '#d33',
+                    })
+                }
             }else{
-                alert(res.data.message)
+                swalinstance.fire({
+                    title : <p>Terjadi Kesalahan</p>,
+                    icon  : "error",
+                    text  : res.data.message,
+                    confirmButtonColor: '#d33',
+                })
             }
         }).catch((err)=>{
-            alert(err)
+            swalinstance.fire({
+                title : <p>Terjadi Kesalahan</p>,
+                icon  : "error",
+                text  : "Terjadi kesalahan, mohon hubungi proktor / pengawas ujian!",
+                confirmButtonColor: '#d33',
+            })
         })
     }
 }

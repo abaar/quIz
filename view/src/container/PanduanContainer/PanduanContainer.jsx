@@ -4,6 +4,10 @@ import FlexContainer from "../FlexContainer";
 import HeaderComponent from "../../component/HeaderComponent/HeaderComponent";
 import axios from "axios";
 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+const swalinstance = withReactContent(Swal)
+
 class PanduanContainer extends React.Component{
 
     constructor(props){
@@ -29,7 +33,12 @@ class PanduanContainer extends React.Component{
                 })
             }
         }).catch((err)=>{
-            alert(err)
+            swalinstance.fire({
+                title : <p>Terjadi Kesalahan</p>,
+                icon  : "error",
+                text  : "Terjadi kesalahan, mohon hubungi proktor / penjaga ujian!",
+                confirmButtonColor: '#d33',
+            })
         })
     }
 
@@ -89,20 +98,40 @@ class PanduanContainer extends React.Component{
     }
 
     onStartClicked = () =>{
-        this.setState({
-            starting:true
-        })
-        axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-        axios.post("/quiz/test/start",{
-            test_id : this.props.details.data.id
-        },{withCredentials:true}).then((res)=>{
-            if(res.data.status){
-               this.props.startTest(1, res.data.data)
-            }else{
-                alert(res.data.message)
+        swalinstance.fire({
+            title: <p>Apakah Anda yakin?</p>,
+            icon:"warning",
+            showCancelButton: true,
+            confirmButtonText: `Mulai`,
+            cancelButtonText: `Batal`,
+        }).then((res)=>{
+            if(res.isConfirmed){
+                this.setState({
+                    starting:true
+                })
+                axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+                axios.post("/quiz/test/start",{
+                    test_id : this.props.details.data.id
+                },{withCredentials:true}).then((res)=>{
+                    if(res.data.status){
+                       this.props.startTest(1, res.data.data)
+                    }else{
+                        swalinstance.fire({
+                            title : <p>Terjadi Kesalahan</p>,
+                            icon  : "error",
+                            text  : res.data.message,
+                            confirmButtonColor: '#d33',
+                        })
+                    }
+                }).catch((err)=>{
+                    swalinstance.fire({
+                        title : <p>Terjadi Kesalahan</p>,
+                        icon  : "error",
+                        text  : "Terjadi kesalahan, mohon hubungi proktor / penjaga ujian!",
+                        confirmButtonColor: '#d33',
+                    })
+                })
             }
-        }).catch((err)=>{
-            alert(err)
         })
     }
 

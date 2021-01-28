@@ -8,6 +8,10 @@ import QNavComponent from "../../component/QNavComponent/QNavComponent";
 import ProgressNotification from "../../component/NotificationComponent/SubmittingComponent/SubmittingComponent"
 import axios from "axios";
 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+const swalinstance = withReactContent(Swal)
+
 class QuizContainer extends React.Component{
     constructor(props){
         super(props)
@@ -81,7 +85,8 @@ class QuizContainer extends React.Component{
                 status  : null,
                 tid     : null
             },
-            currenttime : new Date()
+            currenttime : new Date(),
+            intervalrender  : null
         }
     }
 
@@ -117,17 +122,20 @@ class QuizContainer extends React.Component{
                 hour    : hour,
                 mins    : mins,
                 secs    : secs
-            }
+            },
+            intervalrender:this.startCountDown(),
         })
-        this.startCountDown()
     }
 
-    startCountDown = () =>{
-        setInterval(this.renderTime,1000)
-    }
+    startCountDown = () => setInterval(this.renderTime,1000)
 
 
     renderTime = () =>{
+        if(this.state.remaining.diff <= 0){
+            clearInterval(this.state.intervalrender)
+            this.finishQuiz(false)
+            return
+        }
         let remaining = this.state.remaining
         let seconds   = remaining.secs - 1
         remaining.secs = seconds
@@ -322,12 +330,23 @@ class QuizContainer extends React.Component{
                     }
                 })
             }else{
-                this.setState({
-                    submitstatus : {
-                        status : 1,
-                        tid    : null
-                    }
-                })
+
+                if("code" in result.data && (result.data.code === -1 || result.data.code === 1)){
+                    swalinstance.fire({
+                        title: <p>Waktu Habis</p>,
+                        text: "Mohon maaf, waktu ujian telah selesai...",
+                        icon:"error",
+                    }).then(()=>{
+                        this.props.startTest(-1)
+                    })
+                }else{
+                    this.setState({
+                        submitstatus : {
+                            status : -1,
+                            tid    : null
+                        }
+                    })
+                }
             }
         })
     }, 700)
@@ -336,9 +355,28 @@ class QuizContainer extends React.Component{
         this.setState({submitstatus:{status:null, tid:null}})
     }, 3000)
 
-    finishQuiz = () =>{
-        if(window.confirm("Apakah Anda yakin?")){
-
+    finishQuiz = (confirm = true) =>{
+        if(confirm){
+            swalinstance.fire({
+                title: <p>Apakah Anda yakin?</p>,
+                icon:"warning",
+                showCancelButton: true,
+                confirmButtonText: `Selesaikan`,
+                cancelButtonText: `Batal`,
+            }).then((res)=>{
+                if(res.isConfirmed){
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+                    axios.post("/quiz/test/finish",{
+                        test_id : this.props.quiz.data.id
+                    },
+                    {withCredentials:true}).then((res)=>{
+                        if(res.data.status){
+                            this.props.startTest(-1)
+                        }
+                    })  
+                }
+            })
+        }else if(confirm === false){
             axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
             axios.post("/quiz/test/finish",{
                 test_id : this.props.quiz.data.id

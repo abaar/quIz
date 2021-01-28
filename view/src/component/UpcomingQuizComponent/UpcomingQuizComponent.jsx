@@ -6,7 +6,7 @@ class UpcomingQuizComponent extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-            starting : false
+            starting : this.props.starting
         }
     }
 
@@ -14,10 +14,11 @@ class UpcomingQuizComponent extends React.Component{
 
         const loading = <span className="fas fa-spinner spinning"></span>
 
-        const startbutton = <button className="btn btn-primary" onClick={()=>{this.props.onStartHandler(this.props.details.id,this.props.details)}}>Mulai</button>
-        const continuebutton = <button className="btn btn-warning" onClick={()=>{this.props.onContinueHandler(this.props.details.id,this.props.details); this.setState({starting:true})}}>
+        const startbutton       = <button className="btn btn-primary" onClick={()=>{this.props.onStartHandler(this.props.details.id,this.props.details)}}>Mulai</button>
+        const continuebutton    = <button className="btn btn-warning" onClick={()=>{this.props.onContinueHandler(this.props.details.id,this.props.details); this.setState({starting:true})}}>
             {(this.state.starting)? loading : 'Lanjutkan'}
         </button>;
+        const nilaibutton       = <button className="btn btn-success">Nilai : {(this.props.empty !== true && this.props.loading !== true)?this.props.details.score:"-"}</button>
         return (
             (this.props.empty !== true && this.props.loading !== true)?
             <div className="upcoming-quiz-card">
@@ -26,7 +27,7 @@ class UpcomingQuizComponent extends React.Component{
                         <h3>{this.props.details.kode} - {this.props.details.title}</h3>
                     </div>
                     <div className="upcoming-quiz-start flex-10"> 
-                        {this.props.details.open? (this.props.details.taken?continuebutton:startbutton):""}
+                        {(this.props.details.taken)?nilaibutton:(this.props.details.open? (this.props.details.cont?continuebutton:startbutton):"")}
                     </div>
                 </div>
                 <hr/>
