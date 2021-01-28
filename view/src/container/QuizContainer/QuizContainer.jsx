@@ -198,17 +198,17 @@ class QuizContainer extends React.Component{
                         <div className="q-body-container">
                             <div className="q-header">
                                 <span className="q-header-timer">Sisa Waktu : {remaining.hour+":"+remaining.mins+":"+remaining.secs}</span>
+                                <button className="btn btn-primary q-header-refresh" title="Klik untuk refresh timer" onClick={this.onRefreshHandler}> <span className="fas fa-sync"></span></button>
                             </div>
                             <div className="q-body">
                                 <QuestionComponent setChecked={this.setChecked} details={this.state.current}></QuestionComponent>
                             </div>
                         </div>
                         <div className="q-nav-container">
+                                {(this.state.submitstatus.status !== null)? <ProgressNotification type={(this.state.submitstatus.status === -1)?"error":((this.state.submitstatus.status === 0)?"loading":"success")} ></ProgressNotification> :''}
+                                <br/>
                                 {(this.state.current.index-1 >= 0)? prevbutton: <button disabled className="btn q-nav-btn disabled" onClick={this.moveToPreviousQuestion} id="q-nav-before">Sebelumnya</button>}
                                 {(this.state.current.index+1 < this.state.soals.length)? nextbutton:finnbutton}
-                                <br/>
-                                <br/>
-                                {(this.state.submitstatus.status !== null)? <ProgressNotification type={(this.state.submitstatus.status === -1)?"error":((this.state.submitstatus.status === 0)?"loading":"success")} ></ProgressNotification> :''}
                             </div>
                     </span>
                 </Container>
@@ -280,6 +280,66 @@ class QuizContainer extends React.Component{
                 answers     : currentSubmission,
                 current     : current.id,
                 submitting  : this.delaySubmitting(),
+            }
+        })
+    }
+
+    onRefreshHandler = () =>{
+        let date            = new Date()
+        let day  = date.getDate()
+        if(day < 10){
+            day = "0"+day
+        }
+
+        let month = date.getMonth() + 1
+        if(month < 10){
+            month = "0" + month
+        }
+
+        let year    = date.getFullYear()
+        date        = year+"-"+month+"-"+day;
+
+        axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+        axios.post("/quiz/test/refresh",{
+            data:{
+                test_id     : this.props.quiz.data.id,
+            }
+        },
+        {withCredentials:true}).then((res)=>{
+            if(res.data.status){
+                let end = new Date(`${date} ${res.data.data.end}`)
+                let diff            = Math.floor(Math.abs(end.getTime() - new Date().getTime() ) / 1000)
+                let fixeddiff       = diff
+                let hour    = Math.floor(diff / (60*60))
+                diff        = ~~diff % 3600
+                
+                let mins    = Math.floor(diff / 60)
+                let secs    = ~~diff % 60
+                this.setState({
+                    remaining:{
+                        diff    : fixeddiff,
+                        hour    : hour,
+                        mins    : mins,
+                        secs    : secs
+                    },
+                })
+            }else{
+                if("code" in res.data && (res.data.code === -1 || res.data.code === 1)){
+                    swalinstance.fire({
+                        title: <p>Waktu Habis</p>,
+                        text: "Mohon maaf, waktu ujian telah selesai...",
+                        icon:"error",
+                    }).then(()=>{
+                        this.props.startTest(-1)
+                    })
+                }else{
+                    this.setState({
+                        submitstatus : {
+                            status : -1,
+                            tid    : null
+                        }
+                    })
+                }
             }
         })
     }

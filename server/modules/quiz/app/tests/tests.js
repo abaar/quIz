@@ -47,6 +47,96 @@ exports.questionCount = (req, res) =>{
     }
 }
 
+exports.refresh = (req, res) =>{
+    let {id, subclass_id, class_id , school_id} = req.user
+    let test_id = req.body.data.test_id
+
+    try{
+        repo.getById(test_id).then((test)=>{
+            if(test){
+                let date = new Date(test.date)
+                let day  = date.getDate()
+                if(day < 10){
+                    day = "0"+day
+                }
+
+                let month = date.getMonth() + 1
+                if(month < 10){
+                    month = "0" + month
+                }
+
+                let year    = date.getFullYear()
+                date        = year+"-"+month+"-"+day;
+                
+                let start   = new Date(`${date} ${test.start}`)
+                let end     = new Date(`${date} ${test.end}`)
+                let current = new Date()
+
+                if(current < start && date !== null){
+                    res.send({
+                        status  : false,
+                        code    : -1, 
+                        message : "Ujian diundur / belum dimulai! Cobalah beberapa saat lagi!"
+                    })
+                }else if(current > end && date !== null){
+                    res.send({
+                        status  : false,
+                        code    : 1,
+                        message : "Mohon maaf, Ujian telah selesai!"
+                    })
+
+                    try{
+                        repo.getById(test_id, withQuestionId=true).then((test)=>{
+                            let question_count  = test.getQuestionLen()
+                            Promise.all([
+                                repoTestTakerAnswer.sumOfCorrectAnswers(new TestTaker(null, test.id, id)),
+                                repoTestTakerAnswer.deletedSumOfTest(new TestTaker(null, test.id, id)),
+                                repoTestTakerAnswer.getByTestTaker(new TestTaker(null, test.id, id))
+                            ]).then((values) =>{
+                                let sumOfCorrectAnswers = values[0]
+                                let sumOfDeletedAnswers = values[1]
+                                let testTakerAnswers    = values[2]
+                                if(!sumOfCorrectAnswers){
+                                    return
+                                    //exit
+                                }else{
+                                    let scores = (sumOfCorrectAnswers.correct_total / question_count) * 100
+                                    
+                                    for(let i =0 ; i < testTakerAnswers.length; ++i ){
+                                        if(testTakerAnswers[i].id in sumOfDeletedAnswers)
+                                            testTakerAnswers[i].time_needed_in_seconds += sumOfDeletedAnswers[testTakerAnswers[i].id]
+                                    }
+                
+                                    repoTaker.finish(new TestTaker(null, test.id, id), testTakerAnswers, scores).then((result)=>{
+                                        return
+                                    })
+                                }
+                            })
+                        })
+                    }catch(err){
+                        return
+                    }
+
+                }else if(current < end){
+                    res.send({
+                        status : true,
+                        data   : {
+                            end : test.end
+                        }
+                    })
+                }
+            }
+        })
+    }
+    catch(err){
+        res.send({
+            status  : false,
+            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        });
+    }
+
+}
+
 exports.start = (req, res) =>{
     let {id, subclass_id, class_id , school_id} = req.user
     let test_id = req.body.test_id
