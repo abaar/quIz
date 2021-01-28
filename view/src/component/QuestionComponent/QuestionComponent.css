@@ -1,0 +1,12 @@
+.q-number-container{
+    padding:10px;
+    border:1px solid #013880;
+    color:#013880;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.q-question-container{
+    margin-top:30px;
+    padding-left: 20px;
+}

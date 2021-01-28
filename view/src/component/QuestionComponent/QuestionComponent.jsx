@@ -20,9 +20,11 @@ class QuestionComponent extends React.Component {
 
         return (        
             <span>
-                <h6>Pertanyaan No {this.props.details.index+1}</h6>
-                <p>{this.props.details.question}</p>
-                {answers}
+                <span className="q-number-container"> No {this.props.details.index+1}</span>
+                <div className="q-question-container"> 
+                    <p className="q-question" >{this.props.details.question}</p>
+                    {answers}
+                </div>
                 
             </span>
         )

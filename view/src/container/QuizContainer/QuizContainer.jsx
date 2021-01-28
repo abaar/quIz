@@ -202,14 +202,14 @@ class QuizContainer extends React.Component{
                             <div className="q-body">
                                 <QuestionComponent setChecked={this.setChecked} details={this.state.current}></QuestionComponent>
                             </div>
-                            <div className="q-nav">
+                        </div>
+                        <div className="q-nav-container">
                                 {(this.state.current.index-1 >= 0)? prevbutton: <button disabled className="btn q-nav-btn disabled" onClick={this.moveToPreviousQuestion} id="q-nav-before">Sebelumnya</button>}
                                 {(this.state.current.index+1 < this.state.soals.length)? nextbutton:finnbutton}
                                 <br/>
                                 <br/>
                                 {(this.state.submitstatus.status !== null)? <ProgressNotification type={(this.state.submitstatus.status === -1)?"error":((this.state.submitstatus.status === 0)?"loading":"success")} ></ProgressNotification> :''}
                             </div>
-                        </div>
                     </span>
                 </Container>
             </div>

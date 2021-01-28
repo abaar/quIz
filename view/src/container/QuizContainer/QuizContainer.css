@@ -61,23 +61,23 @@ body{
 }
 
 .q-body-container{
-    width: 75vw;
-    margin: 0px 30%;
-    padding: 15px;
-    border: 1px solid black;
+    position: relative;
+    width: 100vw;
+    padding: 0px 15%;
+    /* padding: 15px; */
 }
 
-.q-body{
-    /* background-color: red; */
-    padding-left: 10px;
-}
+
 
 .q-body h6{
     margin-left: -10px;
 }
 
-.q-nav{
-    margin-top:20px;
+.q-nav-container{
+    position:fixed;
+    width: 100vw;
+    bottom: 0;
+    padding:0px 15%;
 }
 
 .q-nav-btn{
@@ -111,8 +111,8 @@ body{
 
 .q-header-timer{
     padding: 5px;
-    background-color: red;
-    color:white
+    font-weight: bold;
+    border-bottom: 1px solid #013880;
 }
 
 /* Extra small devices (phones, 600px and down) */
@@ -121,6 +121,19 @@ body{
         left : -100%;
         width: 100%;
         max-width: 250px;
+    }
+
+    .q-body-container{
+        padding: 0px 15px;
+    }
+
+    .q-nav-container{
+        padding: 0px 15px;
+    }
+
+    .q-body{
+        /* background-color: red; */
+        margin-left:10px
     }
 }
 
