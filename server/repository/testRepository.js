@@ -32,7 +32,7 @@ exports.getById = (id, withQuestionId = false, withTestTaker = false) => {
                 let test;
 
                 res = result[0]
-                test = new Test(res.id, res.code, res.type, res.title, res.description, res.topic_id, res.subject_id, res.date, res.start, res.end, res.algorithm_id, res.user_id, res.subclass_id, res.class_id, res.school_id, res.randomquestion, res.randomanswers);
+                test = new Test(res.id, res.code, res.type, res.title, res.description, res.topic_id, res.subject_id, res.date, res.start, res.end, res.algorithm_id, res.subclass_id, res.class_id, res.school_id, res.randomquestion, res.randomanswers);
                 
                 if(withQuestionId){
                     for(let i =0 ; i < result.length ; ++i){
@@ -41,7 +41,7 @@ exports.getById = (id, withQuestionId = false, withTestTaker = false) => {
                 }
 
                 if(withTestTaker){
-                    test.addTaker(new TestTaker(null, test.id, test.user_id, res.tstart, res.tend, res.tscore))
+                    test.addTaker(new TestTaker(null, test.id, id, res.tstart, res.tend, res.tscore))
                 }
                 
                 connection.release()
@@ -65,7 +65,7 @@ exports.getByCode = (code) =>{
                     return resolve(false);
                 }
                 result = result[0]
-                let test = new Test(result.id, result.code, result.type, result.title, result.description, result.topic_id, result.subject_id, result.date, result.start, result.end, result.algorithm_id, result.user_id, result.subclass_id, result.class_id, result.school_id, result.randomquestion, result.randomanswers);
+                let test = new Test(result.id, result.code, result.type, result.title, result.description, result.topic_id, result.subject_id, result.date, result.start, result.end, result.algorithm_id, result.subclass_id, result.class_id, result.school_id, result.randomquestion, result.randomanswers);
                 connection.release()
                 return resolve(test);
             });
@@ -78,10 +78,9 @@ exports.getByUser = (user) => {
         try{
             db.getConnection((err,connection) =>{
                 if(err) throw err;
-                
-                let sql = "SELECT tests.* , test_takers.start as tstart , test_takers.end as tend, test_takers.score as tscore FROM tests LEFT JOIN test_takers on tests.id = test_takers.test_id WHERE (date >= curdate() and (tests.user_id = ? or (subclass_id is not null and subclass_id = ?) or (class_id is not null and class_id = ?) or (school_id is not null and school_id = ?))) or (date is null)  ORDER BY tests.type ASC, !ISNULL(tend)";
+                let sql = "SELECT tests.* , test_takers.start as tstart , test_takers.end as tend, test_takers.score as tscore FROM tests LEFT JOIN test_takers on tests.id = test_takers.test_id  AND test_takers.user_id = ? WHERE (date >= curdate() and (test_takers.user_id = ? OR (subclass_id is not null and subclass_id = ?) or (class_id is not null and class_id = ?) or (school_id is not null and school_id = ?))) or (date is null)  ORDER BY tests.type ASC, !ISNULL(tend)";
                 try{
-                    connection.query(sql, [user.id, user.subclass_id , user.class_id , user.school_id], (err,result)=>{
+                    connection.query(sql, [user.id , user.id, user.subclass_id , user.class_id , user.school_id], (err,result)=>{
                         if(err) throw(err)
                         
                         if(!result){
@@ -89,7 +88,7 @@ exports.getByUser = (user) => {
                         }
                         holder = []
                         for( let i = 0 ; i < result.length ; ++i){
-                            let test = new Test(result[i].id, result[i].code, result[i].type, result[i].title, result[i].description, result[i].topic_id, result[i].subject_id, result[i].date, result[i].start, result[i].end, result[i].algorithm_id, result[i].user_id, result[i].subclass_id, result[i].class_id, result[i].school_id, result[i].randomquestion, result[i].randomanswers);
+                            let test = new Test(result[i].id, result[i].code, result[i].type, result[i].title, result[i].description, result[i].topic_id, result[i].subject_id, result[i].date, result[i].start, result[i].end, result[i].algorithm_id, result[i].subclass_id, result[i].class_id, result[i].school_id, result[i].randomquestion, result[i].randomanswers);
                             let test_takers = new TestTaker(null, result[i].id, user.id, result[i].tstart, result[i].tend, result[i].tscore)
                             if(result[i].tstart !== null){
                                 test.addTaker(test_takers)

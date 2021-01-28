@@ -102,26 +102,43 @@ exports.createIfNotExist = (testtaker, data, type) =>{
     return new Promise((resolve,reject) => {
         try{
             let create = true
-            if(type === 0){
-                db.getConnection((err, connection) => {
-                    let sql = "SELECT * FROM test_takers WHERE test_id = ? AND user_id = ?"
-                    connection.query(sql, [data.test_id, data.user_id], (err, result)=>{
+            let update = false
+            let test_takers = null
+            db.getConnection((err, connection) => {
+                let sql = "SELECT * FROM test_takers WHERE test_id = ? AND user_id = ?"
+                connection.query(sql, [data.test_id, data.user_id], (err, result)=>{
+                    if(err)
+                    return resolve(false)
+                    
+                    if(result && type === 0 && result[0].start === null && result[0].end === null){
+                        update      = null
+                        test_takers = result[0] 
+                    }else{
+                        create = false
+                    }
+                })
+                connection.release()
+            });
+
+
+            if(update){
+                db.getConnection((err,connection)=>{
+                    let sql = "UPDATE test_takers SET start = ? WHERE id = ?"
+                    connection.query(sql, [testtaker.start, test_takers.id ], (err,result)=>{
                         if(err)
                             return resolve(false)
                         
-                        if(result)
-                            create = false
+                        connection.release()
+                        return resolve(true)
                     })
-                    connection.release()
-                });
+                })
             }
-
-            if(create){
+            else if(create){
                 db.getConnection((err,connection)=>{
                     let sql = "INSERT INTO test_takers(test_id, user_id, start, end, score) VALUES (?,?,?,?,?)"
                     connection.query(sql, [testtaker.test_id , testtaker.user_id, testtaker.start, testtaker.end, testtaker.score], (err,result)=>{
                         if(err)
-                        return resolve(false)
+                            return resolve(false)
                         
                         connection.release()
                         return resolve(true)

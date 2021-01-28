@@ -5,7 +5,7 @@ const TestTakerAnswer   = require('../../../../models/testTakerAnswers.js')
 const TestTaker         = require('../../../../models/testTakers.js')
 
 exports.submit = (req, res) =>{
-    let {id, subclass_id, class_id , school_id} = req.user
+    const {id, subclass_id, class_id , school_id} = req.user
     const {test_id} = req.body.data
         repoTest.getById(test_id).then((test)=>{
             if(test){
@@ -44,9 +44,9 @@ exports.submit = (req, res) =>{
                         repoTest.getById(test_id, withQuestionId=true).then((test)=>{
                             let question_count  = test.getQuestionLen()
                             Promise.all([
-                                repo.sumOfCorrectAnswers(new TestTaker(null, test.id, test.user_id)),
-                                repo.deletedSumOfTest(new TestTaker(null, test.id, test.user_id)),
-                                repo.getByTestTaker(new TestTaker(null, test.id, test.user_id))
+                                repo.sumOfCorrectAnswers(new TestTaker(null, test.id, id)),
+                                repo.deletedSumOfTest(new TestTaker(null, test.id, id)),
+                                repo.getByTestTaker(new TestTaker(null, test.id, id))
                             ]).then((values) =>{
                                 let sumOfCorrectAnswers = values[0]
                                 let sumOfDeletedAnswers = values[1]
@@ -62,7 +62,7 @@ exports.submit = (req, res) =>{
                                             testTakerAnswers[i].time_needed_in_seconds += sumOfDeletedAnswers[testTakerAnswers[i].id]
                                     }
                 
-                                    repoTaker.finish(new TestTaker(null, test.id, test.user_id), testTakerAnswers, scores).then((result)=>{
+                                    repoTaker.finish(new TestTaker(null, test.id, id), testTakerAnswers, scores).then((result)=>{
                                         return
                                     })
                                 }

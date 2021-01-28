@@ -1,6 +1,5 @@
 const path   = require('path')
-const repo   = require("../../repository/authRepository.js")
-const repoU  = require("../../repository/userRepository.js")
+const repo   = require("../../repository/userRepository.js")
 const bcrypt = require("bcryptjs")
 const jwt    = require("jsonwebtoken")
 const User   = require("../../models/users.js")
@@ -14,7 +13,6 @@ exports.attempt = (req, res)=>{
                 let hashedPassword  = user.password
                 bcrypt.compare(plainPassword,hashedPassword).then((result)=>{
                     if(result){
-
                         let token = jwt.sign({id:user.id, subclass_id:user.subclass_id, class_id:user.class_id, school_id:user.school_id, active:user.active}, process.env.JWT_SECRET, {algorithm:process.env.JWT_ALGO, expiresIn:parseInt(process.env.JWT_EXPIRE) });
                         let refresh = jwt.sign({username:user.username}, process.env.JWT_REFRESH, {algorithm:process.env.JWT_ALGO, expiresIn:parseInt(process.env.JWT_REFRESH_EXPIRE) });
 
@@ -58,7 +56,7 @@ exports.logout = (req, res) =>{
 }
 
 exports.refresh = (req, res) =>{
-    repoU.getByUsername(req.user.username).then((result)=>{
+    repo.getByUsername(req.user.username).then((result)=>{
         if(result){
             let token = jwt.sign({
                 id:result.id,

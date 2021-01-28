@@ -1,5 +1,5 @@
 module.exports = class Test{
-    constructor(id = null , code = null, type = 0, title= null, description= null , topic_id= null , subject_id= null , date= null, start= null, end= null, algorithm_id = null, user_id = null, subclass_id = null , class_id = null, school_id = null , randomquestion = 0 ,randomanswers = 0){
+    constructor(id = null , code = null, type = 0, title= null, description= null , topic_id= null , subject_id= null , date= null, start= null, end= null, algorithm_id = null, subclass_id = null , class_id = null, school_id = null , randomquestion = 0 ,randomanswers = 0){
         this.id             = id
         this.code           = code
         this.type           = type
@@ -11,7 +11,6 @@ module.exports = class Test{
         this.start          = start
         this.end            = end
         this.algorithm_id   = algorithm_id
-        this.user_id        = user_id
         this.subclass_id    = subclass_id
         this.class_id       = class_id
         this.school_id      = school_id

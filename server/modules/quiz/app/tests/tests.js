@@ -10,7 +10,7 @@ const db = require('../../../../config/db.js')
 
 exports.index = (req,res) =>{
     let {id, subclass_id, class_id , school_id} = req.user
-    const user = new User(id, null, null, null, null, null, subclass_id, class_id, school_id)
+    const user = new User(id,null,null,null,null, true, subclass_id, class_id, school_id)
     try{
         repo.getByUser(user).then((tests) => {
             if(tests){
@@ -180,16 +180,16 @@ exports.continue = (req, res) =>{
 }
 
 exports.finish = (req, res) =>{
-    let {id, subclass_id, class_id , school_id} = req.user
+    const {id, subclass_id, class_id , school_id} = req.user
     let test_id = req.body.test_id
 
     try{
         repo.getById(test_id, withQuestionId=true).then((test)=>{
             let question_count  = test.getQuestionLen()
             Promise.all([
-                repoTestTakerAnswer.sumOfCorrectAnswers(new TestTaker(null, test.id, test.user_id)),
-                repoTestTakerAnswer.deletedSumOfTest(new TestTaker(null, test.id, test.user_id)),
-                repoTestTakerAnswer.getByTestTaker(new TestTaker(null, test.id, test.user_id))
+                repoTestTakerAnswer.sumOfCorrectAnswers(new TestTaker(null, test.id, id)),
+                repoTestTakerAnswer.deletedSumOfTest(new TestTaker(null, test.id, id)),
+                repoTestTakerAnswer.getByTestTaker(new TestTaker(null, test.id, id))
             ]).then((values) =>{
                 let sumOfCorrectAnswers = values[0]
                 let sumOfDeletedAnswers = values[1]
@@ -208,7 +208,7 @@ exports.finish = (req, res) =>{
                             testTakerAnswers[i].time_needed_in_seconds += sumOfDeletedAnswers[testTakerAnswers[i].id]
                     }
 
-                    repoTaker.finish(new TestTaker(null, test.id, test.user_id), testTakerAnswers, scores).then((result)=>{
+                    repoTaker.finish(new TestTaker(null, test.id, id), testTakerAnswers, scores).then((result)=>{
                        
                         if(result){
                             res.send({
