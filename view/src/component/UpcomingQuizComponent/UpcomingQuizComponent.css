@@ -2,6 +2,7 @@
     padding:10px;
     border: 1px solid #ced4da;
     margin-bottom: 15px;
+    background-color: white;
 }
 
 .upcoming-quiz-card:hover{

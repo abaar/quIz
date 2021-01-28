@@ -1,3 +1,7 @@
+body{
+    background-color: #f9f7f7;
+}
+
 .padding-5{
     padding:5px;
 }
@@ -15,6 +19,7 @@
     display:flex;
     text-align: center;
     margin-bottom: 2rem;
+    background-color: white;
 }
 
 .tabs > div > p:hover{
@@ -26,6 +31,7 @@
 .tabs > div > p{
     cursor: pointer;
     padding:5px;
+    margin-bottom: 0;
 }
 
 .tabs > div > p.active {
