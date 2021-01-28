@@ -1,6 +1,5 @@
 module.exports = class TestTakerAnswer{
-    constructor(id = null , user_id , test_id , answers_id , question_id , is_correct = false, timestamps, time_needed_in_seconds = 0){
-        this.id                     = id
+    constructor(user_id , test_id , answers_id , question_id , is_correct = false, timestamps, time_needed_in_seconds = 0){
         this.user_id                = user_id
         this.test_id                = test_id
         this.answers_id             = answers_id

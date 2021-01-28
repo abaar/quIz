@@ -100,7 +100,11 @@ module.exports = class Test{
     }
 
     addQuestion = (question) =>{
-        this.question.push(question)
+        this.questions.push(question)
+    }
+
+    getQuestionLen = () =>{
+        return (this.question_ids.length > this.questions.length)? this.question_ids.length : this.questions.length
     }
     
     addLog = (logs) =>{

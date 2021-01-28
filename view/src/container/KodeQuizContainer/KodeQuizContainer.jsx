@@ -10,6 +10,7 @@ import Axios from "axios";
 
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+
 const swalinstance = withReactContent(Swal)
 
 
@@ -23,6 +24,7 @@ class KodeQuizContainer extends React.Component{
             upcomingquizdata :[],
             loading:true,
         }
+
     }
 
     componentDidMount(){
@@ -75,7 +77,7 @@ class KodeQuizContainer extends React.Component{
                             start : startdate,
                             end   : enddate 
                         },
-                        cont    : (takers.length && takers[0].end  == null),
+                        cont    : (takers.length && takers[0].start !== null && takers[0].end  == null),
                         taken   : (takers.length && takers[0].end !== null),
                         score   : (takers.length)? takers[0].score:0
                     })

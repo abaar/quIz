@@ -9,5 +9,6 @@ router.get("/",verifyToken, controller.index);
 router.get("/questionCount", verifyToken, controller.questionCount)
 router.post("/start", verifyToken, controller.start);
 router.post("/continue", verifyToken, controller.continue);
+router.post("/finish", verifyToken, controller.finish)
 
 module.exports = router

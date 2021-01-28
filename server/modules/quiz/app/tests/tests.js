@@ -4,7 +4,9 @@ const User = require('../../../../models/users.js')
 const repo  = require("../../../../repository/testRepository.js")
 const repoTaker = require("../../../../repository/testTakerRepository.js")
 const repoQuestion = require("../../../../repository/questionRepository.js")
+const repoTestTakerAnswer = require("../../../../repository/testTakerAnswersRepository.js")
 const e = require('express')
+const db = require('../../../../config/db.js')
 
 exports.index = (req,res) =>{
     let {id, subclass_id, class_id , school_id} = req.user
@@ -61,7 +63,7 @@ exports.start = (req, res) =>{
                         day = "0"+day
                     }
 
-                    let month = date.getMonth()
+                    let month = date.getMonth() + 1
                     if(month < 10){
                         month = "0" + month
                     }
@@ -92,6 +94,7 @@ exports.start = (req, res) =>{
                         }else{
                             repoQuestion.getQuestionByTest(test,id).then((questions)=>{
                                 test.questions = questions
+                                test.start     = new Date()
                                 res.send({
                                     status : true,
                                     data   : test
@@ -128,7 +131,7 @@ exports.continue = (req, res) =>{
                 day = "0"+day
             }
 
-            let month = date.getMonth()
+            let month = date.getMonth()  + 1
             if(month < 10){
                 month = "0" + month
             }
@@ -159,6 +162,7 @@ exports.continue = (req, res) =>{
                 }else{
                     repoQuestion.getQuestionByTest(test, id).then((questions)=>{
                         test.questions = questions
+                        test.start     = new Date()
                         res.send({
                             status : true,
                             data   : test
@@ -166,6 +170,61 @@ exports.continue = (req, res) =>{
                     })
                 }
             }
+        })
+    }catch(err){
+        res.send({
+            status  : 500,
+            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        });
+    }
+}
+
+exports.finish = (req, res) =>{
+    let {id, subclass_id, class_id , school_id} = req.user
+    let test_id = req.body.test_id
+
+    try{
+        repo.getById(test_id, withQuestionId=true).then((test)=>{
+            let question_count  = test.getQuestionLen()
+            Promise.all([
+                repoTestTakerAnswer.sumOfCorrectAnswers(new TestTaker(null, test.id, test.user_id)),
+                repoTestTakerAnswer.deletedSumOfTest(new TestTaker(null, test.id, test.user_id)),
+                repoTestTakerAnswer.getByTestTaker(new TestTaker(null, test.id, test.user_id))
+            ]).then((values) =>{
+                let sumOfCorrectAnswers = values[0]
+                let sumOfDeletedAnswers = values[1]
+                let testTakerAnswers    = values[2]
+                if(!sumOfCorrectAnswers){
+                    res.send({
+                        status  : 500,
+                        message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                    });
+                    //exit
+                }else{
+                    let scores = (sumOfCorrectAnswers.correct_total / question_count) * 100
+                    
+                    for(let i =0 ; i < testTakerAnswers.length; ++i ){
+                        if(testTakerAnswers[i].id in sumOfDeletedAnswers)
+                            testTakerAnswers[i].time_needed_in_seconds += sumOfDeletedAnswers[testTakerAnswers[i].id]
+                    }
+
+                    repoTaker.finish(new TestTaker(null, test.id, test.user_id), testTakerAnswers, scores).then((result)=>{
+                       
+                        if(result){
+                            res.send({
+                                status  : true,
+                                message : "Ujian telah selesai..."
+                            });
+                        }else{
+                            res.send({
+                                status  : 500,
+                                message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                            });
+                        }
+
+                    })
+                }
+            })
         })
     }catch(err){
         res.send({
