@@ -6,12 +6,13 @@ import {
   Redirect,
 } from "react-router-dom";
 
+import Admin from "./Admin.js"
+
 import LoginContainer from "./container/LoginContainer/LoginContainer";
 import KodeQuizContainer from "./container/KodeQuizContainer/KodeQuizContainer";
 import PanduanContainer from "./container/PanduanContainer/PanduanContainer";
 import QuizContainer from "./container/QuizContainer/QuizContainer";
-import {setAccesstoken, getAccessToken} from "./auth.js";
-import axios from "axios";
+import {setAccesstoken} from "./auth.js";
 
 class App extends React.Component {
 
@@ -28,7 +29,8 @@ class App extends React.Component {
           user  : null,
           // token : null,
         },
-      }
+      },
+      redirect : null
     }
   }
 
@@ -36,6 +38,18 @@ class App extends React.Component {
   }
 
   render(){
+
+    if(this.state.redirect !== null){
+      let to = this.state.redirect
+      this.setState({
+        redirect : null
+      })
+      return ( 
+      <Router>
+        <Redirect to={{ pathname: to }} />
+      </Router>
+      )
+    }
 
     const loginComponent    = <LoginContainer onAuth={this.onAuthHandler} onTestStart={this.onTesInput} />;
     const loginRedirect     = <Redirect to={{pathname: '/'}} />;
@@ -49,6 +63,7 @@ class App extends React.Component {
     return (
       <Router>
         <div className="App">
+          <Admin redirectTo={this.redirectTo} fakeAuth={this.state.fakeAuth} ></Admin>
           <Switch>
             <Route exact path="/">
               {
@@ -77,7 +92,28 @@ class App extends React.Component {
     );
   }
 
+  redirectTo = (to)=>{
+    this.setState({
+      redirect : to
+    })
+  }
+
   onAuthHandler = (status, data) =>{
+    if(status === true && data.userlevel > 0){
+      this.setState({
+        fakeAuth:{
+          auth  : status,
+          data  : {
+            user : data,
+          },
+        }
+      }, ()=>{
+        this.setState({
+          redirect:"/admin"
+        })
+      })
+    }
+
     this.setState({
       fakeAuth:{
         auth  : status,
@@ -87,7 +123,6 @@ class App extends React.Component {
         },
       }
     }) 
-
     setAccesstoken(data? data.token:"")
   }
 
