@@ -162,7 +162,7 @@ class KodeQuizContainer extends React.Component{
                             <div className="tabs">
                                 <div className="flex-50">
                                    <p className={(this.state.list?'active':'')} onClick={()=>this.setState({list:true})}>
-                                        Ujian yang akan datang
+                                        Daftar Ujian
                                    </p>
                                 </div>
                                 <div className="flex-50" onClick={()=>this.setState({list:false})}>
