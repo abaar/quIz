@@ -12,3 +12,8 @@
 .side-navigation:hover span{
     margin-left:5px;
 }
+
+.side-navigation.active{
+    background-color: #013880;
+    color: white;
+}

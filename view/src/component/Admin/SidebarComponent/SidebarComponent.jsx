@@ -22,25 +22,6 @@ class AdminSidebarContainer extends React.Component{
                         <AdminNavigationComponent></AdminNavigationComponent>
                         <AdminNavigationComponent></AdminNavigationComponent>
                         <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
-                        <AdminNavigationComponent></AdminNavigationComponent>
                     </ul>
 
                 </div>
