@@ -23,7 +23,7 @@ exports.attempt = (req, res)=>{
                         })
                         res.send({
                             status  : true,
-                            data    : new User(user.id, user.name, user.username, null, token),
+                            data    : new User(user.id, user.name, user.username, null, token, user.active, user.subclass_id, user.class_id, user.school_id, user.userlevel),
                         });
                     }else{
                         res.send({

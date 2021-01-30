@@ -72,7 +72,7 @@ class LoginContainer extends React.Component{
         return (
             <FlexContainer className="bg-main">
                 {
-                 (this.state.loading)? "Loading...":<LoginComponent onSubmitHandler={this.onSubmitHandler} naming={naming} onChangeHandler={this.onChangeHandler} failed={this.state.failed}/>
+                 (this.state.loading)? <span style={{ color:"white" }}>Loading...</span> :<LoginComponent onSubmitHandler={this.onSubmitHandler} naming={naming} onChangeHandler={this.onChangeHandler} failed={this.state.failed}/>
                 }
                 <FooterComponent></FooterComponent>
                 <NotificationComponent message={this.state.notif.message} type={this.state.notif.type} status={this.state.notif.status}></NotificationComponent>
