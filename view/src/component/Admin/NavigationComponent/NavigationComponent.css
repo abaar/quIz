@@ -1,0 +1,14 @@
+.side-navigation{
+    list-style: none;
+    padding:10px 20px;
+    cursor: pointer;
+}
+
+.side-navigation:hover{
+    background-color: #013880;
+    color: white;
+}
+
+.side-navigation:hover span{
+    margin-left:5px;
+}

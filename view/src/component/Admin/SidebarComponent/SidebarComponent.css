@@ -1,0 +1,44 @@
+.sidebar-container{
+    position: fixed;
+    left: 0;
+    width: 300px;
+    background-color: white;
+    height: 100vh;
+    color:#013880;
+    z-index: 999;
+    box-shadow: -3px 17px 20px 0px #013880;
+}
+
+.sidebar{
+    position: absolute;
+    margin-top: 5rem;
+    width: 100%;
+    overflow-y: scroll;
+    height: calc(100vh - 5rem);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+    height: 2px;
+}
+  
+   
+/* Handle */
+.sidebar::-webkit-scrollbar-thumb {
+    background: #013880; 
+}
+  
+/* Handle on hover */
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: white; 
+}
+
+.hidden-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hidden-scroll {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
