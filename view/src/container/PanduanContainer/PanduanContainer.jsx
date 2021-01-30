@@ -71,7 +71,7 @@ class PanduanContainer extends React.Component{
 
         return (
             <div>
-                <HeaderComponent fakeAuth={this.props.fakeAuth} onLogout={this.onLogoutHandler} />
+                <HeaderComponent fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth}  />
                 <FlexContainer>
                     <div className="col-md-5 col-sm-12 padding-5 side-padding-15 border-login">
                         <h1 style={{ marginBottom:'0px', paddingBottom:'0px' }}>{this.props.details.data.title}</h1>
@@ -133,10 +133,6 @@ class PanduanContainer extends React.Component{
                 })
             }
         })
-    }
-
-    onLogoutHandler = ()=>{
-        this.props.onAuth(false,null)
     }
 }
 

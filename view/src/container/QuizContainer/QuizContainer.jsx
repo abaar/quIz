@@ -179,7 +179,7 @@ class QuizContainer extends React.Component{
 
         return (
             <div>
-                <HeaderComponent fakeAuth={this.props.fakeAuth} onLogout={this.onLogoutHandler} />
+                <HeaderComponent fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  />
                 <Container >
                     <span>
                         <div className={"sidenav-q-container " +(this.state.sidenav.status === true ? "active":"")}>

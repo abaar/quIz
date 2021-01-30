@@ -1,5 +1,8 @@
 import React from "react"
 import "./HeaderComponent.css"
+
+import Axios from "axios"
+
 class HeaderComponent extends React.Component{
 
     constructor(props){
@@ -7,6 +10,18 @@ class HeaderComponent extends React.Component{
         this.state = {
             navigation : false
         }
+    }
+
+    onLogoutHandler = ()=>{
+        Axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+        Axios.post(
+            "/auth/logout",{},
+            {withCredentials:true}
+        ).then((res)=>{
+            this.props.onAuth(false,null)
+        }).catch(()=>{
+            this.props.onAuth(false,null)
+        })
     }
 
     render(){
@@ -20,8 +35,8 @@ class HeaderComponent extends React.Component{
                     </div>
                     <div>
                         <button className="btn color-white btn-hover btn-navigation-sm" onClick={ ()=>this.setState({navigation:!this.state.navigation}) } > <span className="fas fa-bars"></span> </button>
-                        <button className="btn color-white btn-hover btn-navigation" onClick={ () => this.props.onLogout()}>Profile</button>
-                        <button className="btn color-white btn-hover btn-navigation" onClick={ () => this.props.onLogout()}>
+                        <button className="btn color-white btn-hover btn-navigation" onClick={ ()=>{alert("blm implement")} }>Profile</button>
+                        <button className="btn color-white btn-hover btn-navigation" onClick={ this.onLogoutHandler }>
                             <span className="fas fa-sign-out-alt"></span> Logout</button>
                     </div>
                 </nav>
@@ -30,7 +45,7 @@ class HeaderComponent extends React.Component{
                         <ul className="navigation-sm-buttons">
                             <li><span className="fas fa-window-close" onClick={ ()=>this.setState({navigation:!this.state.navigation}) }> </span></li>
                             <li>  <p >Profile</p> </li>
-                            <li>  <p><span className="fas fa-sign-out-alt"></span> Logout</p> </li>
+                            <li onClick={ this.onLogoutHandler }>  <p><span className="fas fa-sign-out-alt"></span> Logout</p> </li>
                         </ul>
                     </div>
                 </div>

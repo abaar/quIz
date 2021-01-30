@@ -63,7 +63,7 @@ class App extends React.Component {
     return (
       <Router>
         <div className="App">
-          <Admin redirectTo={this.redirectTo} fakeAuth={this.state.fakeAuth} ></Admin>
+          <Admin redirectTo={this.redirectTo} fakeAuth={this.state.fakeAuth}  onAuth={this.onAuthHandler} ></Admin>
           <Switch>
             <Route exact path="/">
               {

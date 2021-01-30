@@ -155,7 +155,7 @@ class KodeQuizContainer extends React.Component{
         
         return (
             <div  >
-                <HeaderComponent fakeAuth={this.props.fakeAuth} onLogout={this.onLogoutHandler} />
+                <HeaderComponent fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth} />
                 <Container>
                     <div style={{ width:"100%" }}>
                         <div className="col-sm-12">
@@ -180,17 +180,6 @@ class KodeQuizContainer extends React.Component{
             </div>
 
         );
-    }
-
-    onLogoutHandler = ()=>{
-        Axios.post(
-            "/auth/logout",{},
-            {withCredentials:true}
-        ).then((res)=>{
-            this.props.onAuth(false,null)
-        }).catch(()=>{
-            this.props.onAuth(false,null)
-        })
     }
 
     startUjian = (id, details) =>{

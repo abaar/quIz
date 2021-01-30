@@ -26,7 +26,7 @@ class Admin extends React.Component{
         return (
             <Switch>
                 <Route exact path="/admin">
-                    <HomeContainer redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth} ></HomeContainer>
+                    <HomeContainer redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth} ></HomeContainer>
                 </Route>
                 <Route exact path="/admin/user">
                     <UserContainer redirectTo={this.redirectTo}></UserContainer>

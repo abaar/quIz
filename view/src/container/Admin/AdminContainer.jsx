@@ -15,7 +15,7 @@ class AdminContainer extends React.Component{
     render(){
         return(
             <div style={{ backgroundColor:"#f1f4f6", minHeight:"100vh", minWidth:"100vw" ,display:"inline-block"}}>
-                <AdminHeaderComponent fakeAuth={this.props.fakeAuth} ></AdminHeaderComponent>
+                <AdminHeaderComponent fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth} ></AdminHeaderComponent>
                 <AdminSidebarContainer redirectTo={this.props.redirectTo}></AdminSidebarContainer>
                 <div className="admin-body-container">
                     {this.props.content}
