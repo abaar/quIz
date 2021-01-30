@@ -74,7 +74,7 @@ exports.getByUsername = (username) =>{
                     return resolve(false);
                 }
                 result = result[0]
-                let users = new User(result.id, result.name , result.username, result.password, result.token, result.active, result.subclass_id, result.class_id, result.school_id);
+                let users = new User(result.id, result.name , result.username, result.password, result.token, result.active, result.subclass_id, result.class_id, result.school_id, result.userlevel);
                 connection.release()
                 return resolve(users);
             })
