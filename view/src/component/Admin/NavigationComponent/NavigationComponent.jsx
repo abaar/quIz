@@ -3,18 +3,11 @@ import "./NavigationComponent.css"
 
 class AdminNavigationComponent extends React.Component{
 
-    constructor(props){
-        super(props)
-        this.state ={
-            active:false
-        }
-    }
-
     render(){
         return (
-            <li className={"side-navigation"+(this.state.active?" active":"")}>
+            <li className={"side-navigation"+(this.props.activeKey === this.props.index?" active":"")} onClick={()=>{ this.props.onActive(this.props.index); this.props.redirectTo(this.props.details.path); }}>
                 <span>
-                    AdminCompo
+                    {this.props.details.label}
                 </span>
             </li>
         )

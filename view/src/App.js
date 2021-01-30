@@ -30,7 +30,8 @@ class App extends React.Component {
           // token : null,
         },
       },
-      redirect : null
+      redirect : null,
+      adminactive:null,
     }
   }
 
@@ -63,7 +64,7 @@ class App extends React.Component {
     return (
       <Router>
         <div className="App">
-          <Admin redirectTo={this.redirectTo} fakeAuth={this.state.fakeAuth}  onAuth={this.onAuthHandler} ></Admin>
+          <Admin redirectTo={this.redirectTo} fakeAuth={this.state.fakeAuth}  onAuth={this.onAuthHandler} onActive={this.onAdminActive} activeKey={this.state.adminactive} ></Admin>
           <Switch>
             <Route exact path="/">
               {
@@ -152,6 +153,14 @@ class App extends React.Component {
       })
     }
   }
+
+  
+  onAdminActive = (act) =>{
+      this.setState({
+          adminactive:act
+      })
+  }
+
 }
 
 export default App;

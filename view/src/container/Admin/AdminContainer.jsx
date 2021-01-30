@@ -9,14 +9,14 @@ class AdminContainer extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-
+            active : null
         }
     }
     render(){
         return(
             <div style={{ backgroundColor:"#f1f4f6", minHeight:"100vh", minWidth:"100vw" ,display:"inline-block"}}>
-                <AdminHeaderComponent fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth} ></AdminHeaderComponent>
-                <AdminSidebarContainer redirectTo={this.props.redirectTo}></AdminSidebarContainer>
+                <AdminHeaderComponent  navProvider={this.props.navProvider}  fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth} redirectTo={this.props.redirectTo}  onActive={this.props.onActive} activeKey={this.props.activeKey}></AdminHeaderComponent>
+                <AdminSidebarContainer navProvider={this.props.navProvider}  redirectTo={this.props.redirectTo}  onActive={this.props.onActive} activeKey={this.props.activeKey}></AdminSidebarContainer>
                 <div className="admin-body-container">
                     {this.props.content}
                 </div>

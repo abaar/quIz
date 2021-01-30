@@ -40,11 +40,20 @@
 }
 
 .admin.navigation-sm-buttons > li{
-    padding:20px;
+    /* padding:5px 15px 25px 15px; */
+    padding:0px 15px;
+    margin-top:25px;
 }
 
 .admin.navigation-sm-buttons > li > p{
-    border-bottom: 2px solid #013880;
+    padding:15px 15px 10px 15px;
+    border-bottom: 1px solid #013880;
+    margin-bottom:0px;
+}
+
+.admin.navigation-sm-buttons > li > p.active{
+    background-color: #013880;
+    color:white;
 }
 
 .admin.navigation-sm-buttons > li:first-child{

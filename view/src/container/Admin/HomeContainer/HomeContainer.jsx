@@ -17,7 +17,7 @@ class HomeContainer extends React.Component{
         const home = <p>Halo</p>
 
         return(
-            <AdminContainer content={home} fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth}  redirectTo={this.props.redirectTo}></AdminContainer>
+            <AdminContainer content={home} fakeAuth={this.props.fakeAuth} onActive={this.props.onActive} activeKey={this.props.activeKey} onAuth={this.props.onAuth}  redirectTo={this.props.redirectTo} navProvider={this.props.navProvider} ></AdminContainer>
         )
     }
 }
