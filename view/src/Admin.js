@@ -35,15 +35,31 @@ class Admin extends React.Component{
                 },
                 {
                     path    : "/admin/test/question",
+                    label   : "Kelola Mata Pelajaran"
+                },
+                {
+                    path    : "/admin/test/question",
+                    label   : "Kelola Topik"
+                },
+                {
+                    path    : "/admin/test/question",
+                    label   : "Kelola Kompetensi Dasar"
+                },
+                {
+                    path    : "/admin/test/question",
+                    label   : "Kelola Kompetensi Khusus"
+                },
+                {
+                    path    : "/admin/test/question",
                     label   : "Bank Soal"
                 },
                 {
                     path    : "/admin/test",
-                    label   : "Kelola Test"
+                    label   : "Kelola Ujian"
                 },
                 {
                     path    : "/admin/test/result",
-                    label   : "Hasil Test"
+                    label   : "Hasil Ujian"
                 },
                 {
                     path    : "/admin/school",
@@ -67,7 +83,7 @@ class Admin extends React.Component{
                     <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth} onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
                 </Route>
                 <Route exact path="/admin/user">
-                    <UserContainer navProvider={navigations}  redirectTo={this.redirectTo}  fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth} ></UserContainer>
+                    <UserContainer navProvider={navigations}  redirectTo={this.redirectTo}  fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth} onActive={this.props.onActive} activeKey={this.props.activeKey} ></UserContainer>
                 </Route>
                 <Route exact path="/admin/test">
                     <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
