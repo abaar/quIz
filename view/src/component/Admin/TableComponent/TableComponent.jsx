@@ -52,11 +52,11 @@ class TableComponent extends React.Component{
         return(
             <div>
                 <div style={{ padding:"0px 0px 0px 16px" }}>
-                    <div class="input-group input-group-sm">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-sm"><span className="fas fa-search"></span></span>
+                    <div className="input-group input-group-sm">
+                        <div className="input-group-prepend">
+                            <span className="input-group-text" id="inputGroup-sizing-sm"><span className="fas fa-search"></span></span>
                         </div>
-                        <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Cari data..."/>
+                        <input type="text" className="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Cari data..."/>
                     </div>
                 </div>
                 <DataTable
