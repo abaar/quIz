@@ -35,7 +35,8 @@ exports.verifyToken = async ( req, res, next) =>{
                 id: decrpyt.id,
                 subclass_id : decrpyt.subclass_id,
                 class_id : decrpyt.class_id,
-                school_id : decrpyt.school_id
+                school_id : decrpyt.school_id,
+                userlevel : decrpyt.userlevel
             }
             next()
         }catch(err){
@@ -46,5 +47,21 @@ exports.verifyToken = async ( req, res, next) =>{
         }
     }else{
         return res.status(401).json({'message':"Sesi anda habis, silahkan Login !"});
+    }
+}
+
+exports.verifyAdmin = async ( req, res, next) =>{
+    if (req.user.userlevel > 0){
+        next()
+    }else{
+        return res.status(401).json({'message':"Anda tidak berhak mengakses data ini!"});
+    }
+}
+
+exports.verifyUser = async ( req, res, next) =>{
+    if (req.user.userlevel === 0){
+        next()
+    }else{
+        return res.status(401).json({'message':"Anda tidak berhak mengakses data ini!"});
     }
 }

@@ -2,12 +2,12 @@ const express   = require("express")
 const router    = express.Router()
 
 // mini-routes
-const registration  = require("./registration.js")
+const user  = require("./user.js")
 
 router.get("/", (req,res)=>{
     res.send("admin-index")
 })
 
-router.get("/registration", registration)
+router.use("/user", user)
 
 module.exports = router
