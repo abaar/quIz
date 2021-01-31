@@ -10,5 +10,21 @@ module.exports = class User{
         this.class_id       = class_id
         this.school_id      = school_id
         this.userlevel      = userlevel
+
+        this.school     = null
+        this.subclass   = null
+        this.class      = null
+    }
+
+    setSchool = (school)=>{
+        this.school = school
+    }
+
+    setSubclass = (subclass) =>{
+        this.subclass = subclass
+    }
+
+    setClass = (clas) =>{
+        this.class = clas
     }
 }

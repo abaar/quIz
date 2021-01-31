@@ -14,6 +14,6 @@ module.exports = class Subclass{
     }
 
     setSchool = (school)=>{
-        this.school = schoo
+        this.school = school
     }
 }

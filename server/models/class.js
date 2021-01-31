@@ -18,6 +18,6 @@ module.exports = class Class{
     }
 
     setSchool = (school)=>{
-        this.school = schoo
+        this.school = school
     }
 }

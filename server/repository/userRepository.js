@@ -23,22 +23,29 @@ exports.getById = (id) => {
     });
 }
 
-exports.allUsers = new Promise((resolve, reject)=>{
-    db.getConnection((err,connection)=>{
-        if(err) throw(err)
-        
-        let sql = "SELECT * FROM USERS";
-        connection.query(sql, (err, result)=>{
+exports.allUsers = (raw = false) =>{
+        return new Promise((resolve, reject)=>{
+        db.getConnection((err,connection)=>{
             if(err) throw(err)
-            let users = [];
-            result.forEach(element => {
-                users.push(new User(element.id, element.name, element.username, null, null, element.active, element.subclass_id, element.class_id, element.school_id , element.userlevel));
-            });
-            connection.release()
-            return resolve(users);
+            
+            let sql = "SELECT * FROM USERS";
+            connection.query(sql, (err, result)=>{
+                if(err) throw(err)
+                let users = [];
+                
+                if(raw){
+                    users = result
+                }else{
+                    result.forEach(element => {
+                        users.push(new User(element.id, element.name, element.username, null, null, element.active, element.subclass_id, element.class_id, element.school_id , element.userlevel));
+                    });
+                }
+                connection.release()
+                return resolve(users);
+            })
         })
-    })
-});
+    });
+}
 
 exports.saveUser = (user)=>{
     return new Promise((resolve, reject)=>{
