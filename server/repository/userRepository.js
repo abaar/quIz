@@ -32,7 +32,7 @@ exports.allUsers = new Promise((resolve, reject)=>{
             if(err) throw(err)
             let users = [];
             result.forEach(element => {
-                users.push(new User(element.id, element.name));
+                users.push(new User(element.id, element.name, element.username, null, null, element.active, element.subclass_id, element.class_id, element.school_id , element.userlevel));
             });
             connection.release()
             return resolve(users);

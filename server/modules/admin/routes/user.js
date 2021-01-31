@@ -5,6 +5,6 @@ const { verifyToken, verifyAdmin }   = require("../../auth/verifyToken.js")
 
 const registrationController = require("../app/user/user.js")
 
-router.get("/data",[verifyToken, verifyAdmin],registrationController.indexData)
+router.get("/all",[verifyToken, verifyAdmin],registrationController.allData)
 
 module.exports  = router

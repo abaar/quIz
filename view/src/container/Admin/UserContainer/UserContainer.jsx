@@ -3,7 +3,7 @@ import "./UserContainer.css"
 
 import AdminContainer from "../AdminContainer"
 import TableComponent from "../../../component/Admin/TableComponent/TableComponent"
-
+import axios from "axios"
 
 const data = [{ id: 1, title: 'Conan the Barbarian',  title2: 'Conan the Barbarian', year: '1982' }];
 const columns = [
@@ -36,7 +36,15 @@ class UserContainer extends React.Component{
     }
 
     componentDidMount(){
-
+        axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+        axios.get("/admin/user/all",{
+        },
+        {withCredentials:true}).then((res)=>{
+            console.log(res)
+            this.setState({
+                loading:false
+            })
+        })
     }
 
     render(){
