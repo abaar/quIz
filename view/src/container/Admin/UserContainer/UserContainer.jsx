@@ -524,7 +524,7 @@ password    : this.state.value.password,
             showCancelButton: true,
             cancelButtonText: `Batal`,
             showLoaderOnConfirm: true,
-            allowOutsideClick: () => !Swal.isLoading()
+            allowOutsideClick: () => !swalinstance.isLoading()
         }).then((click)=>{
             if(click.isConfirmed){
                 let user_ids = [];

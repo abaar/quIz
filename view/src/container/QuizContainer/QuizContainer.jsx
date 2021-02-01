@@ -423,6 +423,8 @@ class QuizContainer extends React.Component{
                 showCancelButton: true,
                 confirmButtonText: `Selesaikan`,
                 cancelButtonText: `Batal`,
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !swalinstance.isLoading()
             }).then((res)=>{
                 if(res.isConfirmed){
                     axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 

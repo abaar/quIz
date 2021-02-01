@@ -104,6 +104,8 @@ class PanduanContainer extends React.Component{
             showCancelButton: true,
             confirmButtonText: `Mulai`,
             cancelButtonText: `Batal`,
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !swalinstance.isLoading()
         }).then((res)=>{
             if(res.isConfirmed){
                 this.setState({
