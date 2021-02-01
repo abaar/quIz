@@ -22,7 +22,7 @@ exports.index = (req,res) =>{
         });
     }catch(err){
         res.send({
-            status  : 500,
+            status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
         });
     }
@@ -41,7 +41,7 @@ exports.questionCount = (req, res) =>{
         })
     }catch(err){
         res.send({
-            status  : 500,
+            status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
         });
     }
@@ -194,7 +194,7 @@ exports.start = (req, res) =>{
                     }
                 }else{
                     res.send({
-                        status  : 500,
+                        status  : false,
                         message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
                     });
                 }
@@ -202,7 +202,7 @@ exports.start = (req, res) =>{
         })
     }catch(err){
         res.send({
-            status  : 500,
+            status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
         });
     }
@@ -263,7 +263,7 @@ exports.continue = (req, res) =>{
         })
     }catch(err){
         res.send({
-            status  : 500,
+            status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
         });
     }
@@ -286,7 +286,7 @@ exports.finish = (req, res) =>{
                 let testTakerAnswers    = values[2]
                 if(!sumOfCorrectAnswers){
                     res.send({
-                        status  : 500,
+                        status  : false,
                         message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
                     });
                     //exit
@@ -307,7 +307,7 @@ exports.finish = (req, res) =>{
                             });
                         }else{
                             res.send({
-                                status  : 500,
+                                status  : false,
                                 message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
                             });
                         }
@@ -318,7 +318,7 @@ exports.finish = (req, res) =>{
         })
     }catch(err){
         res.send({
-            status  : 500,
+            status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
         });
     }

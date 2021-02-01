@@ -97,7 +97,6 @@ class LoginContainer extends React.Component{
             username:this.state.username,
             password:this.state.password
         }).then((res)=>{
-            console.log(res)
             if(res.data.status){
                 let {id, name, username , token, userlevel} = res.data.data
                 let user = {

@@ -88,3 +88,38 @@ exports.getByUsername = (username) =>{
         })
     });
 }
+
+exports.update = (user, changePassword = false) =>{
+    return new Promise((resolve, reject)=>{
+        db.getConnection((err,connection)=>{
+            if(err) {
+                throw(err)
+            }
+            
+            if(changePassword){
+                const sql = `UPDATE users SET username = ? , name = ? , password = ?, userlevel =? , school_id  =? , class_id = ?, subclass_id = ? WHERE id = ?`;
+                bcrypt.hash(user.password,10, (err,hashedPassword)=>{
+                    if(err){
+                        throw(err)
+                    }
+                    connection.query(sql,[user.username, user.name, hashedPassword, user.userlevel, user.school_id, user.class_id, user.subclass_id, user.id],(err, result)=>{
+                        if(err){
+                            return resolve(false);
+                        }
+                        connection.release()
+                        return resolve(true);
+                    })
+                })
+            }else{
+                const sql = `UPDATE users SET username = ? , name = ?, userlevel =? , school_id  =? , class_id = ?, subclass_id = ? WHERE id = ?`;
+                connection.query(sql,[user.username, user.name, user.userlevel, user.school_id, user.class_id, user.subclass_id, user.id],(err, result)=>{
+                    if(err) 
+                        return resolve(false);
+                    
+                    connection.release()
+                    return resolve(true);
+                })
+            }
+        })
+    });
+}

@@ -37,23 +37,18 @@ exports.allData = (req, res)=>{
 
             classes.forEach(element => {
                 class_obj[element.id] = new Class(element.id, element.school_id , element.name)
-                let school = new School(school_obj[element.school_id].id , school_obj[element.school_id].name)
-                class_obj[element.id].setSchool(school)
-
-                school_obj[element.school_id].addClass(class_obj[element.id])
             })
 
             subclasses.forEach(element =>{
                 subclass_obj[element.id] = new Subclass(element.id, element.class_id , element.name)
 
-                let clas   = new Class(class_obj[element.class_id].id, class_obj[element.class_id].school_id, class_obj[element.class_id].name)
-                subclass_obj[element.id].setClass(clas)
-
-                let school = new School(school_obj[clas.school_id].id , school_obj[clas.school_id].name)
-                subclass_obj[element.id].setSchool(school)
-
                 class_obj[element.class_id].addSubclass(subclass_obj[element.id])
             })
+
+            const key = Object.keys(class_obj)
+            for(let i =0 ; i < key.length; ++i ){
+                school_obj[class_obj[key[i]].school_id].addClass(class_obj[key[i]])
+            }
 
 
             users.forEach(element => {
@@ -77,9 +72,9 @@ exports.allData = (req, res)=>{
             res.send({
                 status : true,
                 data   : {
-                    subclass : Object.values(subclass_obj),
-                    class    : Object.values(class_obj),
-                    schools  : Object.values(school_obj),
+                    // _subclass : Object.values(subclass_obj),
+                    // _class    : Object.values(class_obj),
+                    _schools  : Object.values(school_obj),
                     users    : users_arr
                 }
             })
@@ -87,8 +82,83 @@ exports.allData = (req, res)=>{
 
     }catch(err){
         res.send({
-            status  : 500,
+            status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
         });
+    }
+}
+
+exports.store = (req,res) => {
+    const {user} = req.body
+    try{
+
+        if(user.username.length < 4){
+            res.send({
+                status  : false,
+                message : "Username minimal harus 4 karakter!"
+            }); 
+
+            return
+        }
+
+        repo.getByUsername(user.username).then((result)=>{
+            if(!result){
+                repo.saveUser(new User(null, user.name, user.username, user.username, null, 1, user.subclass_id, user.class_id, user.school_id, user.userlevel)).then((inserted)=>{
+                    if(inserted){
+                        res.send({
+                            status  : true,
+                            message : "Berhasil menambahkan data!"
+                        })
+                    }else{
+                        res.send({
+                            status  : false,
+                            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                        }); 
+                    }
+                })
+            }else{
+                res.send({
+                    status  : false,
+                    message : "Username telah ada dalam database! Mohon gunakan username lainnya!"
+                })
+            }
+        })
+        
+    }catch(err){
+        res.send({
+            status  : false,
+            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        }); 
+    }
+}
+
+exports.update = (req,res) =>{
+    const {user} = req.body
+    try{
+        if(user.password > 0 && user.password < 6){
+            res.send({
+                status  : false,
+                message : "Apabila ingin merubah password, minimal 6 karakter"
+            }); 
+            return
+        }
+        repo.update(new User(user.id, user.name, user.username, user.password, null, 1, user.subclass, user.class ,user.school, user.userlevel), (user.password.length>0)).then((result)=>{
+            if(result){
+                res.send({
+                    status  : true,
+                    message : "Berhasil menyimpan data!"
+                })
+            }else{
+                res.send({
+                    status  : false,
+                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                }); 
+            }
+        })
+    }catch(err){
+        res.send({
+            status  : false,
+            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        }); 
     }
 }

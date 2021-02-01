@@ -94,7 +94,7 @@ exports.submit = (req, res) =>{
                 }
             }else{
                 res.send({
-                    status  : 500,
+                    status  : false,
                     message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
                 });
             }
