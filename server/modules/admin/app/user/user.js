@@ -162,3 +162,27 @@ exports.update = (req,res) =>{
         }); 
     }
 }
+
+exports.destroy = (req,res) => {
+    const {user_ids } = req.body
+    try{
+        repo.destroy(user_ids).then((result)=>{
+            if(result){
+                res.send({
+                    status  : true,
+                    message : "Berhasil menghapus data!"
+                })
+            }else{
+                res.send({
+                    status  : false,
+                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                }); 
+            } 
+        })
+    }catch(err){
+        res.send({
+            status  : false,
+            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        }); 
+    }
+}

@@ -495,7 +495,6 @@ password    : this.state.value.password,
             user.subclass   = (user.subclass)? user.subclass.value : null
             user.userlevel  = (user.userlevel)? user.userlevel.value : 0
 
-            console.log(user)
             axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
             axios.post("/admin/user/update",{
                 user:user
@@ -513,6 +512,42 @@ password    : this.state.value.password,
                 }
             })
         }
+    }
+
+    onDeleteHandler = () =>{
+        swalinstance.fire({
+            title:"Apakah Anda yakin?",
+            text: "Anda akan menghapus "+this.state.selectedRows.length+" data. Data yang akan dihapus tidak dapat dikembalikan!",
+            confirmButtonColor: '#d33',
+            icon : "warning",
+            confirmButtonText: `Hapus`,
+            showCancelButton: true,
+            cancelButtonText: `Batal`,
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((click)=>{
+            if(click.isConfirmed){
+                let user_ids = [];
+
+                for(let i =0 ; i < this.state.selectedRows.length; ++i){
+                    user_ids.push(this.state.selectedRows[i].id)
+                }
+
+                axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+                axios.post("/admin/user/destroy",{
+                    user_ids:user_ids
+                },
+                {withCredentials:true}).then((res)=>{
+                    if(res.data.status){
+                        swalinstance.fire({title:"Berhasil", text:res.data.message, icon:"success"}).then(()=>{
+                            this.props.remount()
+                        })
+                    }else{
+                        swalinstance.fire({title:"Gagal", text:res.data.message, icon:"error"})
+                    }
+                })
+            }
+        })
     }
 
     onUsernameValueChangeHandler = (event) => {
@@ -571,8 +606,8 @@ password    : this.state.value.password,
                             </div>
                             <div className="admin-action">
                                 <button className="btn btn-sm btn-outline-primary btn__table__action" onClick={ this.onAddHandler }> <span className="fas fa-plus"></span> <span className="label">Tambah</span> </button>
-                                <button className={"btn btn-sm btn-outline-warning btn__table__action" + ((this.state.selectedRows.length !== 1)?" disabled":"")} onClick={this.onEditHandler } disabled={(this.state.selectedRows.length !== 1)}> <span className="fas fa-edit"></span> <span className="label">Ubah</span></button>
-                                <button className={"btn btn-sm btn-outline-danger btn__table__action" + ((this.state.selectedRows.length === 0)?" disabled":"")}  disabled={(this.state.selectedRows.length ===0)}> <span className="fas fa-trash"></span> <span className="label">Hapus</span></button>
+                                <button className={"btn btn-sm btn-outline-warning btn__table__action" + ((this.state.selectedRows.length !== 1)?" disabled":"")} onClick={ this.onEditHandler } disabled={(this.state.selectedRows.length !== 1)}> <span className="fas fa-edit"></span> <span className="label">Ubah</span></button>
+                                <button className={"btn btn-sm btn-outline-danger btn__table__action" + ((this.state.selectedRows.length === 0)?" disabled":"")}  onClick={ this.onDeleteHandler } disabled={(this.state.selectedRows.length ===0)}> <span className="fas fa-trash"></span> <span className="label">Hapus</span></button>
                                 <button className="btn btn-sm btn-outline-success btn__table__action" onClick={ this.onDownloadHandler }> <span className="fas fa-file-download"></span> <span className="label">Export CSV</span></button>
                             </div>
                         </div>
@@ -661,7 +696,7 @@ password    : this.state.value.password,
         return(
             <span>
                 <AdminContainer content={home} fakeAuth={this.props.fakeAuth} onActive={this.props.onActive} activeKey={this.props.activeKey} onAuth={this.props.onAuth}  redirectTo={this.props.redirectTo} navProvider={this.props.navProvider} ></AdminContainer>
-                <ModalComponent title={(this.overrideadd)?"Ubah User":"Tambah User"} body={body} footer={footer} open={this.state.modaladd?true:false} onAddHideHandler={this.onAddHideHandler}></ModalComponent>
+                <ModalComponent title={(this.state.overrideadd === true)?"Ubah User":"Tambah User"} body={body} footer={footer} open={this.state.modaladd?true:false} onAddHideHandler={this.onAddHideHandler}></ModalComponent>
             </span>
         )
     }

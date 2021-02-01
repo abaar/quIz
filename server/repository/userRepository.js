@@ -123,3 +123,22 @@ exports.update = (user, changePassword = false) =>{
         })
     });
 }
+
+exports.destroy = (users_id)=>{
+    return new Promise((resolve,reject)=>{
+        db.getConnection((err,connection)=>{
+            if(err) {
+                throw(err)
+            }
+
+            const sql = `DELETE FROM users  WHERE id in (?)`;
+            connection.query(sql,[users_id],(err, result)=>{
+                if(err) 
+                    return resolve(false);
+                
+                connection.release()
+                return resolve(true);
+            })
+        })
+    })
+}
