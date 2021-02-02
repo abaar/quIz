@@ -5,11 +5,11 @@ const bcrypt    = require('bcryptjs');
 exports.getById = (id) => {
     return new Promise((resolve, reject) =>{
         db.getConnection((err,connection) =>{
-            if(err) throw err;
+            if(err) return resolve(false);
             
             let sql = "SELECT id, name, username from USERS where id = ?";
             connection.query(sql, [id], (err,result)=>{
-                if(err) throw(err)
+                if(err) return resolve(false);
 
                 if(result.length == 0){
                     return resolve(false);
@@ -26,11 +26,11 @@ exports.getById = (id) => {
 exports.allUsers = (raw = false) =>{
         return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
-            if(err) throw(err)
+            if(err) return resolve(false);
             
             let sql = "SELECT * FROM USERS";
             connection.query(sql, (err, result)=>{
-                if(err) throw(err)
+                if(err) return resolve(false);
                 let users = [];
                 
                 if(raw){
@@ -50,15 +50,15 @@ exports.allUsers = (raw = false) =>{
 exports.saveUser = (user)=>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
-            if(err) throw(err);
+            if(err) return resolve(false);
             let sql = "INSERT INTO USERS(name, username, password, subclass_id, class_id, school_id) VALUES(?,?,?,?,?,?)";
             bcrypt.hash(user.password,10, (err,hashedPassword)=>{
                 if(err){
-                    throw(err)
+                    return resolve(false);
                 }
                 connection.query(sql, [user.name,user.username, hashedPassword, user.subclass_id, user.class_id, user.school_id],(err, result)=>{
                     if(err) {
-                        throw(err)
+                        return resolve(false);
                     }
                     connection.release()
                     return resolve(true);
@@ -71,11 +71,11 @@ exports.saveUser = (user)=>{
 exports.getByUsername = (username) =>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
-            if(err) throw(err)
+            if(err) return resolve(false);
         
             let sql = `SELECT * FROM USERS WHERE username = ?`;
             connection.query(sql,[username],(err, result)=>{
-                if(err) throw(err)
+                if(err) return resolve(false);
                 
                 if(result.length == 0){
                     return resolve(false);
@@ -93,14 +93,14 @@ exports.update = (user, changePassword = false) =>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
             if(err) {
-                throw(err)
+                return resolve(false);
             }
             
             if(changePassword){
                 const sql = `UPDATE users SET username = ? , name = ? , password = ?, userlevel =? , school_id  =? , class_id = ?, subclass_id = ? WHERE id = ?`;
                 bcrypt.hash(user.password,10, (err,hashedPassword)=>{
                     if(err){
-                        throw(err)
+                        return resolve(false);
                     }
                     connection.query(sql,[user.username, user.name, hashedPassword, user.userlevel, user.school_id, user.class_id, user.subclass_id, user.id],(err, result)=>{
                         if(err){
@@ -128,7 +128,7 @@ exports.destroy = (users_id)=>{
     return new Promise((resolve,reject)=>{
         db.getConnection((err,connection)=>{
             if(err) {
-                throw(err)
+                return resolve(false);
             }
 
             const sql = `DELETE FROM users  WHERE id in (?)`;
