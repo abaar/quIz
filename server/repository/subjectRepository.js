@@ -5,11 +5,11 @@ const Subject   = require("../models/subjects.js")
 exports.all = (raw = false) =>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
-            if(err) throw(err)
+            if(err) return resolve(false);
             
             let sql = "SELECT * FROM subjects";
             connection.query(sql, (err, result)=>{
-                if(err) throw(err)
+                if(err) return resolve(false);
                 let tres = [];
 
                 if(raw){
@@ -30,12 +30,12 @@ exports.all = (raw = false) =>{
 exports.store = (subject)=>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
-            if(err) throw(err);
+            if(err) return resolve(false);
             let sql = "INSERT INTO subjects(name) VALUES(?)";
 
             connection.query(sql, [subject.name],(err, result)=>{
                 if(err) {
-                    throw(err)
+                    return resolve(false);
                 }
 
                 connection.release()
@@ -49,12 +49,12 @@ exports.store = (subject)=>{
 exports.update = (subject)=>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
-            if(err) throw(err);
+            if(err) return resolve(false);
             let sql = "UPDATE subjects SET name = ? WHERE id = ?";
 
             connection.query(sql, [subject.name, subject.id],(err, result)=>{
                 if(err) {
-                    throw(err)
+                    return resolve(false);
                 }
 
                 connection.release()
@@ -69,7 +69,7 @@ exports.destroy = (matpel_ids)=>{
     return new Promise((resolve,reject)=>{
         db.getConnection((err,connection)=>{
             if(err) {
-                throw(err)
+                return resolve(false);
             }
 
             const sql = `DELETE FROM subjects WHERE id in (?)`;
