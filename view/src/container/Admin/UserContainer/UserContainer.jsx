@@ -274,7 +274,7 @@ class UserContainer extends React.Component{
                     value : {
                         id          : this.state.value.id,
                         username    : this.state.value.username,
-password    : this.state.value.password,
+                        password    : this.state.value.password,
                         name        : this.state.value.name,
                         userlevel   : this.state.value.userlevel,
                         school      : null,
@@ -595,6 +595,21 @@ password    : this.state.value.password,
         })
     }
 
+    setSearch = (search) => {
+        const datas   =  this.state._datas
+        const display = []
+        for(let i =0 ; i < datas.length ; ++i){
+            let target = `${datas[i].name.toLowerCase()} ${datas[i].username.toLowerCase()} ${datas[i].school.toLowerCase()} ${datas[i].class.toLowerCase()} ${datas[i].subclass.toLowerCase()}`
+            let tf = new RegExp(search,"i").test(target)
+            if(tf === true){
+                display.push(datas[i])
+            }
+        }
+        this.setState({
+            _display : display
+        })
+    }
+
     render(){
         const home = <div className="admin-content-container">
                         <div className="admin-content-header">
@@ -613,8 +628,7 @@ password    : this.state.value.password,
                         </div>
                         <div className="admin-content-body">
                             <div className="admin-content-body data">
-                                    
-                                    {this.state.loading?  <span> <span className="fas fa-spinner spinning"></span> Loading...</span>:<TableComponent onSelectedRowsHandler={this.onSelectedRowsHandler} data={this.state._display} cols={columns} title="Daftar User"/>}
+                                    {this.state.loading?  <span> <span className="fas fa-spinner spinning"></span> Loading...</span>:<TableComponent setSearch={this.setSearch} onSelectedRowsHandler={this.onSelectedRowsHandler} data={this.state._display} cols={columns} title="Daftar User"/>}
                             </div>
                         </div>
                     </div>

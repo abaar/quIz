@@ -3,6 +3,29 @@ import DataTable from 'react-data-table-component';
 import "./TableComponent.css"
 
 class TableComponent extends React.Component{
+
+
+    constructor(props){
+        super(props)
+        this.state = {
+            inDebounce : null,
+        }
+    }
+
+    setSearch = (event) => setTimeout(() => {
+        this.props.setSearch(event.target.value)
+    }, 1000)
+
+
+    onSearchInputChange = (event) =>{
+        if("setSearch" in this.props){
+            clearInterval(this.state.inDebounce)
+            this.setState({
+                inDebounce:this.setSearch(event)
+            })
+        }
+    }
+
     render(){
         return(
             <div>
@@ -11,7 +34,7 @@ class TableComponent extends React.Component{
                         <div className="input-group-prepend">
                             <span className="input-group-text" id="inputGroup-sizing-sm"><span className="fas fa-search"></span></span>
                         </div>
-                        <input type="text" className="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Cari data..."/>
+                        <input type="text" className="form-control" onChange={(event)=>{this.onSearchInputChange(event)}} placeholder="Cari data..."/>
                     </div>
                 </div>
                 <DataTable
