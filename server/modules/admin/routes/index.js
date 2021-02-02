@@ -4,6 +4,7 @@ const router    = express.Router()
 // mini-routes
 const user    = require("./user.js")
 const subject = require("./subject.js") 
+const topic = require("./topic.js") 
 
 router.get("/", (req,res)=>{
     res.send("admin-index")
@@ -11,5 +12,6 @@ router.get("/", (req,res)=>{
 
 router.use("/user", user)
 router.use("/subject", subject)
+router.use("/topic", topic)
 
 module.exports = router
