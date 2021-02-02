@@ -4,10 +4,16 @@ module.exports = class CoreCompetency{
         this.topic_id    = topic_id
         this.name        = name
         this.description = description
-        this.class       = class_
+        this.class_id    = class_
         
+        this.subject     = null
+        this.class       = null
         this.topic       = null
         this.baseCompetencies = []
+    }
+
+    setSubject = (subject) =>{
+        this.subject    = subject
     }
 
     setTopic = (topic) => {
@@ -16,6 +22,10 @@ module.exports = class CoreCompetency{
 
     getTopic = () =>{
         return this.topic
+    }
+
+    setClass = (class_) => {
+        this.class = class_
     }
 
     addBaseCompetency = (BaseCompetency) =>{
