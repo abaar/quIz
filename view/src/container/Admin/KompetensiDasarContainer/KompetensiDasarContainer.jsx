@@ -1,5 +1,4 @@
 import React from "react"
-import "./KompetensiIntiContainer.css"
 
 import AdminContainer from "../AdminContainer"
 import TableComponent from "../../../component/Admin/TableComponent/TableComponent"
@@ -22,31 +21,35 @@ const columns = [
     name: 'Mata Pelajaran',
     selector: 'subject',
     sortable: true,
+    maxWidth:"100px",
   },
   {
     name: 'Topik',
     selector: 'topic',
     sortable: true,
+    maxWidth:"100px",
   },
   {
     name: 'Kompetensi Inti',
-    selector: 'name',
+    selector: 'core',
     sortable: true,
   },
   {
     name: 'Kelas',
     selector: 'class',
     sortable: true,
+    maxWidth:"100px",
   },
   {
-    name: 'Deskripsi',
+    name: 'Kompetensi Dasar',
     selector: 'description',
     sortable: true,
+    minWidth : "500px"
   },
 ];
 const swalinstance = withReactContent(Swal)
 
-class KompetensiIntiContainer extends React.Component{
+class KompetensiDasarContainer extends React.Component{
     
     constructor(props){
         super(props);
@@ -67,7 +70,7 @@ class KompetensiIntiContainer extends React.Component{
                     loading  : true,
                     data     : [],
                 },
-                classes : {
+                cores : {
                     disabled : true,
                     loading  : true,
                     data     : [],
@@ -79,33 +82,27 @@ class KompetensiIntiContainer extends React.Component{
                 subject     : null,
                 topic       : null,
                 description : "",
-                class       : null,
+                class       : "",
+                core        : null,
             },
         }
 
         this.subjectref = React.createRef()
         this.topicref = React.createRef()
-        this.classref = React.createRef()
+        this.coreref = React.createRef()
     }
 
     componentDidMount(){
         axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-        axios.get("/admin/competency/core/all",{
+        axios.get("/admin/competency/base/all",{
         },
         {withCredentials:true}).then((res)=>{
             new Promise((resolve, reject)=>{
-                let {subjects , competencies, classes} = res.data.data
+                let {subjects , competencies } = res.data.data
 
                 const _subjects = []
                 const _datas    = []
-                const _classes  = []
 
-                for(let i =0 ; i < classes.length ; ++i){
-                    _classes.push({
-                        value : classes[i].id,
-                        label : classes[i].name,
-                    })
-                }
 
                 for(let i = 0 ; i< subjects.length ; ++i){
                     let element = subjects[i]
@@ -120,14 +117,14 @@ class KompetensiIntiContainer extends React.Component{
                     _datas.push({
                         index   : i+1,
                         id      : competencies[i].id,
-                        name    : competencies[i].name,
-                        subject : competencies[i].subject.name,
-                        subject_id  : competencies[i].subject.id,
-                        topic       : competencies[i].topic.name,
-                        topic_id    : competencies[i].topic.id,
+                        core    : competencies[i].coreCompetency.name,
+                        core_id : competencies[i].coreCompetency.id,
                         description : competencies[i].description,
-                        class       : competencies[i].class.name,
-                        class_id    : competencies[i].class.id,
+                        class   : competencies[i].class,
+                        subject : competencies[i].subject.name,
+                        subject_id: competencies[i].subject.id,
+                        topic   : competencies[i].topic.name,
+                        topic_id: competencies[i].topic.id
                     })
                 }
 
@@ -146,10 +143,10 @@ class KompetensiIntiContainer extends React.Component{
                             loading  : true,
                             data     : [],
                         },
-                        classes : {
-                            disabled : false,
-                            loading  : false,
-                            data     : _classes,      
+                        cores : {
+                            disabled : true,
+                            loading  : true,
+                            data     : [],      
                         }
                     },
                 })
@@ -179,9 +176,9 @@ class KompetensiIntiContainer extends React.Component{
                     "no"              : element.index,
                     "mata pelajaran"  : element.subject,
                     "topik"           : element.topic,
-                    "kompetensi inti" : element.name,
+                    "kompetensi inti" : element.core,
                     "kelas"           : element.class,
-                    "deskripsi"       : element.description,
+                    "kompetensi dasar": element.description,
                 })
             });
 
@@ -198,11 +195,18 @@ class KompetensiIntiContainer extends React.Component{
     onEditHandler = () => {
         const data = this.state.select.subjects.data
         let topics = null
+        let cores  = null
 
         for(let i =0 ; i < data.length; ++i){
             if(data[i].value === this.state.selectedRows[0].subject_id){
                 topics = data[i].topics
-                break
+                for( let  j = 0 ; j < topics.length ; ++j){
+                    if(topics[j].id === this.state.selectedRows[0].topic_id){
+                        cores = topics[j].coreCompetencies
+                        i = 99999
+                        break
+                    }
+                }
             }
         }
 
@@ -213,14 +217,15 @@ class KompetensiIntiContainer extends React.Component{
                 id          : this.state.selectedRows[0].id,
                 name        : this.state.selectedRows[0].name,
                 subject     : {value : this.state.selectedRows[0].subject_id, label: this.state.selectedRows[0].subject, topics: topics},
-                topic       : {value : this.state.selectedRows[0].topic_id, label: this.state.selectedRows[0].topic},
-                class       : {value : this.state.selectedRows[0].class_id , label : this.state.selectedRows[0].class},
+                topic       : {value : this.state.selectedRows[0].topic_id, label: this.state.selectedRows[0].topic, cores : cores},
+                class       : this.state.selectedRows[0].class,
                 description : this.state.selectedRows[0].description,
+                core        : {value : this.state.selectedRows[0].core_id , label :this.state.selectedRows[0].core}
             }
         }, () =>{
             this.subjectref.current.select.setValue(this.state.value.subject, 'set-value') 
             this.topicref.current.select.setValue(this.state.value.topic, 'set-value')
-            this.classref.current.select.setValue(this.state.value.class, 'set-value')           
+            this.coreref.current.select.setValue(this.state.value.core, 'set-value')           
         })
     }
 
@@ -235,11 +240,12 @@ class KompetensiIntiContainer extends React.Component{
                 topic       : null,
                 description : "",
                 class       : null,
+                core        : null,
             }
         }, ()=>{
             this.subjectref.current.select.clearValue()
             this.topicref.current.select.clearValue()
-            this.classref.current.select.clearValue()
+            this.coreref.current.select.clearValue()
         })
     }
 
@@ -250,11 +256,12 @@ class KompetensiIntiContainer extends React.Component{
         }else if(this.state.value.topic === null){
             swalinstance.fire({title:"Wajib memilih Topik Mata Pelajaran!", icon:"error"})
             return
-        }else if(this.state.value.class === null){
-            swalinstance.fire({title:"Wajib memilih Kelas!", icon:"error"})
+        }
+        else if(this.state.value.core === null){
+            swalinstance.fire({title:"Wajib memilih Kompetensi Inti!", icon:"error"})
             return
-        }else if(this.state.value.name === "" || this.state.value.name === null){
-            swalinstance.fire({title:"Kompetensi Inti tidak boleh kosong!", icon:"error"})
+        }else if(this.state.value.description === "" || this.state.value.description === null){
+            swalinstance.fire({title:"Kompetensi Dasar tidak boleh kosong!", icon:"error"})
             return
         }else{
             this.setState({
@@ -262,11 +269,9 @@ class KompetensiIntiContainer extends React.Component{
             })
 
             const value = this.state.value
-            value.topic_id = value.topic.value
-            value.class_id = value.class.value
-
+            value.core_id = value.core.value
             axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-            axios.post("/admin/competency/core/store",{
+            axios.post("/admin/competency/base/store",{
                 value:value
             },
             {withCredentials:true}).then((res)=>{
@@ -291,11 +296,12 @@ class KompetensiIntiContainer extends React.Component{
         }else if(this.state.value.topic === null){
             swalinstance.fire({title:"Wajib memilih Topik Mata Pelajaran!", icon:"error"})
             return
-        }else if(this.state.value.class === null){
-            swalinstance.fire({title:"Wajib memilih Kelas!", icon:"error"})
+        }
+        else if(this.state.value.core === null){
+            swalinstance.fire({title:"Wajib memilih Kompetensi Inti!", icon:"error"})
             return
-        }else if(this.state.value.name === "" || this.state.value.name === null){
-            swalinstance.fire({title:"Kompetensi Inti tidak boleh kosong!", icon:"error"})
+        }else if(this.state.value.description === "" || this.state.value.description === null){
+            swalinstance.fire({title:"Kompetensi Dasar tidak boleh kosong!", icon:"error"})
             return
         }else{
             this.setState({
@@ -303,11 +309,9 @@ class KompetensiIntiContainer extends React.Component{
             })
 
             const value = this.state.value
-            value.topic_id = value.topic.value
-            value.class_id = value.class.value
-
+            value.core_id = value.core.value
             axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-            axios.post("/admin/competency/core/update",{
+            axios.post("/admin/competency/base/update",{
                 value:value
             },
             {withCredentials:true}).then((res)=>{
@@ -345,7 +349,7 @@ class KompetensiIntiContainer extends React.Component{
                 }
 
                 axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-                axios.post("/admin/competency/core/destroy",{
+                axios.post("/admin/competency/base/destroy",{
                     value_ids:value_ids
                 },
                 {withCredentials:true}).then((res)=>{
@@ -365,7 +369,7 @@ class KompetensiIntiContainer extends React.Component{
         const datas   =  this.state._datas
         const display = []
         for(let i =0 ; i < datas.length ; ++i){
-            let target = `${datas[i].name.toLowerCase()} ${datas[i].subject.toLowerCase()} ${datas[i].topic.toLowerCase()} ${datas[i].class.toLowerCase} ${datas[i].description.toLowerCase()}`
+            let target = `${datas[i].core.toLowerCase()} ${datas[i].subject.toLowerCase()} ${datas[i].topic.toLowerCase()} ${datas[i].class.toLowerCase} ${datas[i].description.toLowerCase()}`
             let tf = new RegExp(search,"i").test(target)
             if(tf === true){
                 display.push(datas[i])
@@ -373,19 +377,6 @@ class KompetensiIntiContainer extends React.Component{
         }
         this.setState({
             _display : display
-        })
-    }
-
-    onCoreCompetency = (event) => {
-        this.setState({
-            value : {
-                id      : this.state.value.id,
-                name    : event.target.value,
-                subject     : this.state.value.subject,
-                topic       : this.state.value.topic,
-                description : this.state.value.description,
-                class       : this.state.value.class,
-            }
         })
     }
 
@@ -398,12 +389,14 @@ class KompetensiIntiContainer extends React.Component{
                 topic       : this.state.value.topic,
                 description : event.target.value,
                 class       : this.state.value.class,
+                core        : this.state.value.core,
             }
         })
     }
 
     onSelectChangeHandler = (name, value) =>{
         if(name === "subject"){
+            const curvalue = this.state.value
             const topics = []
             const selects = this.state.select
             if(value === null){
@@ -412,22 +405,18 @@ class KompetensiIntiContainer extends React.Component{
                     loading  : true,
                     data     : []
                 }
-                this.setState({
-                    select: selects,
-                    value : {
-                        id          : this.state.value.id,
-                        name        : this.state.value.name,
-                        subject     : null,
-                        topic       : this.state.value.topic,
-                        description : this.state.value.description,
-                        class       : this.state.value.class,
-                    }
-                })
+
+                selects.cores = {
+                    disabled : true,
+                    loading  : true,
+                    data     : []
+                }
             }else{
                 value.topics.forEach(element =>{
                     topics.push({
                         value : element.id,
-                        label : element.name
+                        label : element.name,
+                        cores : element.coreCompetencies
                     })
                 })
 
@@ -436,40 +425,49 @@ class KompetensiIntiContainer extends React.Component{
                     loading  : false,
                     data     : topics
                 }
-
-                this.setState({
-                    select: selects,
-                    value : {
-                        id          : this.state.value.id,
-                        name        : this.state.value.name,
-                        subject     : value,
-                        topic       : this.state.value.topic,
-                        description : this.state.value.description,
-                        class       : this.state.value.class,
-                    }
-                })
             }
-        }else if(name === "topic"){
+
+            curvalue.subject = value
             this.setState({
-                value : {
-                    id          : this.state.value.id,
-                    name        : this.state.value.name,
-                    subject     : this.state.value.subject,
-                    topic       : value,
-                    description : this.state.value.description,
-                    class       : this.state.value.class,
-                }
+                select: selects,
+                value : curvalue
             })
-        }else if(name === "class"){
-            this.setState({
-                value : {
-                    id          : this.state.value.id,
-                    name        : this.state.value.name,
-                    subject     : this.state.value.subject,
-                    topic       : this.state.value.topic,
-                    description : this.state.value.description,
-                    class       : value,
+        }else if(name === "topic"){
+            const curvalue = this.state.value
+            const cores = []
+            const selects = this.state.select
+
+            if(value === null){
+                selects.cores = {
+                    disabled : true,
+                    loading  : true,
+                    data     : cores
                 }
+            }else{
+                value.cores.forEach(element => {
+                    cores.push({
+                        value : element.id,
+                        label : element.name,
+                        class : element.class.name
+                    })
+                })
+                selects.cores = {
+                    disabled : false,
+                    loading  : false,
+                    data     : cores
+                }
+            }
+            curvalue.topic = value
+            this.setState({
+                value  : curvalue,
+                select : selects
+            })
+        }else if(name === "core"){
+            const curvalue = this.state.value
+            curvalue.class = value.class
+            curvalue.core  = value
+            this.setState({
+                value:curvalue
             })
         }
     }
@@ -478,9 +476,9 @@ class KompetensiIntiContainer extends React.Component{
         const home = <div className="admin-content-container">
                         <div className="admin-content-header">
                             <div className="admin-title">
-                                <h2 style={{ marginBottom:"0" }}>Kompetensi Inti</h2>
+                                <h2 style={{ marginBottom:"0" }}>Kompetensi Dasar</h2>
                                 <small>
-                                    <span>Admin</span> <span> / </span> <span> Kompetensi Inti</span>
+                                    <span>Admin</span> <span> / </span> <span> Kompetensi Dasar</span>
                                 </small>
                             </div>
                             <div className="admin-action">
@@ -492,7 +490,7 @@ class KompetensiIntiContainer extends React.Component{
                         </div>
                         <div className="admin-content-body">
                             <div className="admin-content-body data">
-                                    {this.state.loading?  <span> <span className="fas fa-spinner spinning"></span> Loading...</span>:<TableComponent setSearch={this.setSearch} onSelectedRowsHandler={this.onSelectedRowsHandler} data={this.state._display} cols={columns} title="Daftar Kompetensi Inti"/>}
+                                    {this.state.loading?  <span> <span className="fas fa-spinner spinning"></span> Loading...</span>:<TableComponent setSearch={this.setSearch} onSelectedRowsHandler={this.onSelectedRowsHandler} data={this.state._display} cols={columns} title="Daftar Kompetensi Dasar"/>}
                             </div>
                         </div>
                     </div>
@@ -522,21 +520,21 @@ class KompetensiIntiContainer extends React.Component{
                     <label htmlFor="" className="control-label">Kelas</label>
                 </div>
                 <div className="col-9">
-                    <Select isDisabled={this.state.select.classes.disabled}  ref={this.classref} 
-                        isLoading={this.state.select.classes.loading} options={this.state.select.classes.data} onChange={(value)=>{this.onSelectChangeHandler("class", value)}}></Select>
+                    <input type="text" value={this.state.value.class} disabled className="form-control" placeholder="Pilih Kompetensi Inti"/>
                 </div>
             </div>
             <div className="form-group row">
                 <div className="col-3">
-                    <label htmlFor="" className="control-label required">Kompetensi Inti</label>
+                    <label htmlFor="" className="control-label">Kompetensi Inti</label>
                 </div>
                 <div className="col-9">
-                    <input type="text" className="form-control" value={this.state.value.name} onChange={this.onCoreCompetency} placeholder="Kompetensi Inti..."/>
+                    <Select isDisabled={this.state.select.cores.disabled}  ref={this.coreref} 
+                        isLoading={this.state.select.cores.loading} options={this.state.select.cores.data} onChange={(value)=>{this.onSelectChangeHandler("core", value)}}></Select>
                 </div>
             </div>
             <div className="form-group row">
                 <div className="col-3">
-                    <label htmlFor="" className="control-label">Deskripsi</label>
+                    <label htmlFor="" className="control-label required">Kompetensi Dasar</label>
                 </div>
                 <div className="col-9">
                     <textarea placeholder="Deskripsi" className="form-control" value={this.state.value.description} onChange={this.onDescriptionChange} />
@@ -554,10 +552,10 @@ class KompetensiIntiContainer extends React.Component{
         return(
             <span>
                 <AdminContainer content={home} fakeAuth={this.props.fakeAuth} onActive={this.props.onActive} activeKey={this.props.activeKey} onAuth={this.props.onAuth}  redirectTo={this.props.redirectTo} navProvider={this.props.navProvider} ></AdminContainer>
-                <ModalComponent title={(this.state.overrideadd === true)?"Ubah Kompetensi Inti":"Tambah Kompetensi Inti"} body={body} footer={footer} open={this.state.modaladd?true:false} onAddHideHandler={this.onAddHideHandler}></ModalComponent>
+                <ModalComponent title={(this.state.overrideadd === true)?"Ubah Kompetensi Dasar":"Tambah Kompetensi Dasar"} body={body} footer={footer} open={this.state.modaladd?true:false} onAddHideHandler={this.onAddHideHandler}></ModalComponent>
             </span>
         )
     }
 }
 
-export default KompetensiIntiContainer
+export default KompetensiDasarContainer

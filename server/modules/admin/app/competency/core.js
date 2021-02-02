@@ -36,7 +36,6 @@ exports.all = (req, res)=>{
             topic.forEach(element => {
                 topic_obj[element.id] =  new Topic(element.id, element.name, element.subject_id)
 
-                console.log(element.subject_id)
                 subject_obj[element.subject_id].addTopic(topic_obj[element.id])
                 topic_obj[element.id].setSubject(new Subject(subject_obj[topic_obj[element.id].subject_id].id, subject_obj[topic_obj[element.id].subject_id].name ))
             })

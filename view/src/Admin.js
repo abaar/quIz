@@ -11,6 +11,7 @@ import UserContainer from "./container/Admin/UserContainer/UserContainer";
 import MataPelajaranContainer from "./container/Admin/MataPelajaranContainer/MataPelajaranContainer";
 import TopikContainer from "./container/Admin/TopikContainer/TopikContainer";
 import KompetensiIntiContainer from "./container/Admin/KompetensiIntiContainer/KompetensiIntiContainer";
+import KompetensiDasarContainer from "./container/Admin/KompetensiDasarContainer/KompetensiDasarContainer";
 
 class Admin extends React.Component{
     constructor(props){
@@ -49,8 +50,12 @@ class Admin extends React.Component{
                     label   : "Kelola Kompetensi Inti"
                 },
                 {
+                    path    : "/admin/test/competency/base",
+                    label   : "Kelola Kompetensi Dasar"
+                },
+                {
                     path    : "/admin/test/competency/indicator",
-                    label   : "Kelola Kompetensi Khusus"
+                    label   : "Kelola Indikator"
                 },
                 {
                     path    : "/admin/test/question",
@@ -96,6 +101,9 @@ class Admin extends React.Component{
                 </Route>
                 <Route exact path="/admin/test/competency/core">
                     <KompetensiIntiContainer key={this.state.key} remount={()=>{this.setState({key:this.state.key+1})}} navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey} downloadCSV={this.downloadCSV}></KompetensiIntiContainer>
+                </Route>
+                <Route exact path="/admin/test/competency/base">
+                    <KompetensiDasarContainer key={this.state.key} remount={()=>{this.setState({key:this.state.key+1})}}  navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></KompetensiDasarContainer>
                 </Route>
                 <Route exact path="/admin/test/competency/indicator">
                     <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>

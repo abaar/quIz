@@ -5,6 +5,9 @@ module.exports = class BaseCompetency{
         this.description = description
 
         this.coreCompetency = null
+        this.class          = null
+        this.topic          = null
+        this.subject        = null
         this.specificCompetencies = []
     }
 
@@ -18,19 +21,6 @@ module.exports = class BaseCompetency{
 
     addSpecificCompetency = (SpecificCompetency) =>{
         this.specificCompetencies.push(SpecificCompetency)
-    }
-
-    delSpecificCompetency = (SpecificCompetency) =>{
-        for(let i =0 ; i < this.specificCompetencies.length ; ++i){
-            if(this.specificCompetencies[i].id == SpecificCompetency.id){
-                this.specificCompetencies.splice(i , 1)
-                return
-            }
-        }
-    }
-
-    clearSpecificCompetencies = () =>{
-        this.specificCompetencies = []
     }
 
     getSpecificCompetencies = () =>{
