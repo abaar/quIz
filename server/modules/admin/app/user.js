@@ -1,13 +1,13 @@
 const path  = require('path')
-const repo  = require("../../../../repository/userRepository.js")
-const repoSubclass  = require("../../../../repository/subclassRepository.js")
-const repoClass     = require("../../../../repository/classRepository.js")
-const repoSchool    = require("../../../../repository/schoolRepository.js")
+const repo  = require("../../../repository/userRepository.js")
+const repoSubclass  = require("../../../repository/subclassRepository.js")
+const repoClass     = require("../../../repository/classRepository.js")
+const repoSchool    = require("../../../repository/schoolRepository.js")
 
-const School    = require("../../../../models/school.js")
-const Class     = require("../../../../models/class.js")
-const Subclass  = require("../../../../models/subclass.js")
-const User      = require("../../../../models/users.js")
+const School    = require("../../../models/school.js")
+const Class     = require("../../../models/class.js")
+const Subclass  = require("../../../models/subclass.js")
+const User      = require("../../../models/users.js")
 
 exports.allData = (req, res)=>{
     try{

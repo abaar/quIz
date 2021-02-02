@@ -3,7 +3,7 @@ const router    = express.Router()
 const path      = require("path")
 const { verifyToken, verifyAdmin, verifyUser }   = require("../../auth/verifyToken.js")
 
-const registrationController = require("../app/user/user.js")
+const registrationController = require("../app/user.js")
 
 router.get("/all",[verifyToken, verifyAdmin],registrationController.allData)
 

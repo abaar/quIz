@@ -8,6 +8,7 @@ import {
 
 import HomeContainer from "./container/Admin/HomeContainer/HomeContainer";
 import UserContainer from "./container/Admin/UserContainer/UserContainer";
+import MataPelajaranContainer from "./container/Admin/MataPelajaranContainer/MataPelajaranContainer";
 
 class Admin extends React.Component{
     constructor(props){
@@ -34,19 +35,19 @@ class Admin extends React.Component{
                     label   : "Kelola User"
                 },
                 {
-                    path    : "/admin/test/question",
+                    path    : "/admin/test/subject",
                     label   : "Kelola Mata Pelajaran"
                 },
                 {
-                    path    : "/admin/test/question",
+                    path    : "/admin/test/topic",
                     label   : "Kelola Topik"
                 },
                 {
-                    path    : "/admin/test/question",
+                    path    : "/admin/test/competency",
                     label   : "Kelola Kompetensi Dasar"
                 },
                 {
-                    path    : "/admin/test/question",
+                    path    : "/admin/test/competency/indicator",
                     label   : "Kelola Kompetensi Khusus"
                 },
                 {
@@ -84,6 +85,18 @@ class Admin extends React.Component{
                 </Route>
                 <Route exact path="/admin/user">
                     <UserContainer key={this.state.key} remount={()=>{this.setState({key:this.state.key+1})}} navProvider={navigations}  redirectTo={this.redirectTo}  fakeAuth={this.props.fakeAuth} onAuth={this.props.onAuth} onActive={this.props.onActive} activeKey={this.props.activeKey} downloadCSV={this.downloadCSV} ></UserContainer>
+                </Route>
+                <Route exact path="/admin/test/subject">
+                    <MataPelajaranContainer  key={this.state.key} remount={()=>{this.setState({key:this.state.key+1})}} navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}  downloadCSV={this.downloadCSV} ></MataPelajaranContainer>
+                </Route>
+                <Route exact path="/admin/test/topic">
+                    <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
+                </Route>
+                <Route exact path="/admin/test/competency">
+                    <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
+                </Route>
+                <Route exact path="/admin/test/competency/indicator">
+                    <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
                 </Route>
                 <Route exact path="/admin/test">
                     <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>

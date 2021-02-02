@@ -14,7 +14,7 @@ exports.all = (raw = false) =>{
                 if(raw){
                     tres = result
                 }else{
-                    result.array.forEach(element => {
+                    result.forEach(element => {
                         tres.push(new School(element.id, element.name))
                     });
                 }

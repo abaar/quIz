@@ -14,7 +14,7 @@ exports.all = (raw = false) =>{
                 if(raw){
                     subclass = result
                 }else{
-                    result.array.forEach(element => {
+                    result.forEach(element => {
                         subclass.push(new Subclass(element.id , element.class_id, element.name))
                     });
                 }

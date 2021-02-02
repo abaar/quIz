@@ -193,17 +193,17 @@ class UserContainer extends React.Component{
                 for(let j =0 ; j < classes.length; ++j){
                     if(classes[j].id === this.state.selectedRows[0].class_id){
                         const subclasses =  classes[j].subclass
-                        return [school, classes, subclasses]
+                        return [classes, subclasses]
                     }
                 }
             }
         }
 
-        return [[],[],[]]
+        return [[],[]]
     }
 
     onEditHandler = () => {
-        const [school, classes, subclasses] = this.findSchoolClassesSubclasses()
+        const [classes, subclasses] = this.findSchoolClassesSubclasses()
       
         this.setState({
             modaladd : true,
@@ -450,7 +450,7 @@ class UserContainer extends React.Component{
     }
 
     onSubmithandler = ()=>{
-        if(this.state.value.username === null || this.state.value.username === null){
+        if((this.state.value.username === null || this.state.value.username === "") || (this.state.value.name === null || this.state.value.name === "" )){
             swalinstance.fire({title:"Isian tidak lengkap", icon:"error"})
             return
         }else{
@@ -485,7 +485,12 @@ class UserContainer extends React.Component{
         if(this.state.value.password.length >0  && this.state.value.password.length < 6){
             swalinstance.fire({title:"Apabila ingin merubah password, minimal 6 karakter", icon:"error"})
             return
-        }else{
+        }
+        else if ((this.state.value.name === null || this.state.value.name === "" )){
+            swalinstance.fire({title:"Isian tidak lengkap", icon:"error"})
+            return
+        }
+        else{
             this.setState({
                 addsubmitting:true
             })
