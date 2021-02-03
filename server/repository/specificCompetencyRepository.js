@@ -1,12 +1,12 @@
 const db        = require("../config/db.js")
-const BaseCompetency     = require("../models/baseCompetency.js")
+const SpecificCompetency     = require("../models/specificCompetency.js")
 
 exports.all = (raw = false) =>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
             if(err) return resolve(false);
             
-            let sql = "SELECT * FROM base_competency";
+            let sql = "SELECT * FROM specific_competency";
             connection.query(sql, (err, result)=>{
                 if(err) return resolve(false);
                 let tres = [];
@@ -15,7 +15,7 @@ exports.all = (raw = false) =>{
                     tres = result
                 }else{
                     result.forEach(element => {
-                        tres.push(new BaseCompetency(element.id, element.core_id, element.description))
+                        tres.push(new SpecificCompetency(element.id, element.base_id, element.description))
                     });
                 }
                 connection.release()
@@ -25,13 +25,13 @@ exports.all = (raw = false) =>{
     });
 }
 
-exports.store = (baseCompetency)=>{
+exports.store = (specificCompetency)=>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
             if(err) return resolve(false);
-            let sql = "INSERT INTO base_competency(core_id, description) VALUES(?,?)";
+            let sql = "INSERT INTO specific_competency(base_id, description) VALUES(?,?)";
 
-            connection.query(sql, [baseCompetency.core_id, baseCompetency.description],(err, result)=>{
+            connection.query(sql, [specificCompetency.base_id, specificCompetency.description],(err, result)=>{
                 if(err) {
                     return resolve(false);
                 }
@@ -44,13 +44,13 @@ exports.store = (baseCompetency)=>{
     });
 } 
 
-exports.update = (baseCompetency)=>{
+exports.update = (specificCompetency)=>{
     return new Promise((resolve, reject)=>{
         db.getConnection((err,connection)=>{
             if(err) return resolve(false);
-            let sql = "UPDATE base_competency SET core_id = ?, description = ? WHERE id = ?";
+            let sql = "UPDATE specific_competency SET base_id = ?, description = ? WHERE id = ?";
 
-            connection.query(sql, [baseCompetency.core_id, baseCompetency.description, baseCompetency.id],(err, result)=>{
+            connection.query(sql, [specificCompetency.base_id, specificCompetency.description, specificCompetency.id],(err, result)=>{
                 if(err) {
                     return resolve(false);
                 }
@@ -70,7 +70,7 @@ exports.destroy = (value_ids)=>{
                 return resolve(false);
             }
 
-            const sql = `DELETE FROM base_competency WHERE id in (?)`;
+            const sql = `DELETE FROM specific_competency WHERE id in (?)`;
             connection.query(sql,[value_ids],(err, result)=>{
                 if(err) 
                     return resolve(false);
