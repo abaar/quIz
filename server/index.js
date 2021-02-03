@@ -14,7 +14,7 @@ const quiz    = require("./modules/quiz/routes/index.js")
 app.use(cors({credentials: true}))
 app.use(cParser())
 app.use(express.json());
-app.use(bParser.urlencoded({extended:false}));
+app.use(bParser.urlencoded({extended:false, limit:"50mb"}));
 
 app.use("/admin",admins);
 app.use("/auth", auth);

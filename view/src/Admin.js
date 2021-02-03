@@ -13,6 +13,7 @@ import TopikContainer from "./container/Admin/TopikContainer/TopikContainer";
 import KompetensiIntiContainer from "./container/Admin/KompetensiIntiContainer/KompetensiIntiContainer";
 import KompetensiDasarContainer from "./container/Admin/KompetensiDasarContainer/KompetensiDasarContainer";
 import IndikatorContainer from "./container/Admin/IndikatorContainer/IndikatorContainer";
+import BankBacaanContainer from "./container/Admin/BankBacaanContainer/BankBacaanContainer";
 
 class Admin extends React.Component{
     constructor(props){
@@ -57,6 +58,10 @@ class Admin extends React.Component{
                 {
                     path    : "/admin/test/competency/indicator",
                     label   : "Kelola Indikator"
+                },
+                {
+                    path    : "/admin/test/question/passage",
+                    label   : "Bank Bacaan"
                 },
                 {
                     path    : "/admin/test/question",
@@ -114,6 +119,9 @@ class Admin extends React.Component{
                 </Route>
                 <Route exact path="/admin/test/result">
                     <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
+                </Route>
+                <Route exact path="/admin/test/question/passage">
+                    <BankBacaanContainer  key={this.state.key} remount={()=>{this.setState({key:this.state.key+1})}} navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey} downloadCSV={this.downloadCSV}></BankBacaanContainer>
                 </Route>
                 <Route exact path="/admin/test/question">
                     <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>

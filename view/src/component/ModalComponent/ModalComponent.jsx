@@ -6,7 +6,7 @@ class ModalComponent extends React.Component{
         return(
             <span>
                 <div className={"modal fade "+ (this.props.open === true?" show":"")} style={{ display:(this.props.open === true?"block":"none") }}>
-                    <div className="modal-dialog">
+                    <div className="modal-dialog  modal-lg">
                         <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">{this.props.title}</h5>
