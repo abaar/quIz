@@ -45,6 +45,8 @@ class TableComponent extends React.Component{
                     data={this.props.data}
                     selectableRows={true}
                     onSelectedRowsChange={this.props.onSelectedRowsHandler}
+                    expandableRows={("expandableRows" in this.props)}
+                    expandableRowsComponent={("expandableRows" in this.props)?this.props.expandableRowsComponent:<span></span>}
                     />
             </div>
         )
