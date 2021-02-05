@@ -84,6 +84,7 @@ exports.finish = (testtaker, testTakerAnswers, scores)=>{
                                     throw err;
                                   });
                                 }
+                                conn.release()
                                 return resolve(true)
                             })
                         })
@@ -109,7 +110,7 @@ exports.createIfNotExist = (testtaker, data, type) =>{
                 connection.query(sql, [data.test_id, data.user_id], (err, result)=>{
                     if(err)
                         return resolve(false)
-                    
+                    console.log(data)
                     if(result && type === 0 && result[0].start === null && result[0].end === null){
                         update      = true
                         test_takers = result[0] 

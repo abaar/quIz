@@ -30,12 +30,12 @@ class TableComponent extends React.Component{
         return(
             <div>
                 <div style={{ padding:"0px 0px 0px 16px" }}>
-                    <div className="input-group input-group-sm">
+                    {("setSearch" in this.props)? <div className="input-group input-group-sm">
                         <div className="input-group-prepend">
                             <span className="input-group-text" id="inputGroup-sizing-sm"><span className="fas fa-search"></span></span>
                         </div>
                         <input type="text" className="form-control" onChange={(event)=>{this.onSearchInputChange(event)}} placeholder="Cari data..."/>
-                    </div>
+                    </div>:""}
                 </div>
                 <DataTable
                     overflowY={true}

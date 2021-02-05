@@ -696,7 +696,7 @@ class UserContainer extends React.Component{
             </div>
             <div className="form-group row">
                 <div className="col-3">
-                    <label htmlFor="" className="control-label">Sub- Kelas</label>
+                    <label htmlFor="" className="control-label">Sub - Kelas</label>
                 </div>
                 <div className="col-9">
                     <Select isDisabled={this.state.select.subclass.disabled} ref={this.subclassref} 

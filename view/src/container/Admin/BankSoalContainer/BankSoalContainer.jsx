@@ -3,7 +3,6 @@ import React from "react"
 import AdminContainer from "../AdminContainer"
 import TableComponent from "../../../component/Admin/TableComponent/TableComponent"
 import ModalComponent from "../../../component/ModalComponent/ModalComponent"
-import katex from "katex"
 import axios from "axios"
 import Select from 'react-select';
 import Swal from "sweetalert2"
@@ -724,7 +723,7 @@ class BankSoalContainer extends React.Component{
                         </div>
                         <div className="admin-content-body">
                             <div className="admin-content-body data">
-                                    {this.state.loading?  <span> <span className="fas fa-spinner spinning"></span> Loading...</span>:<TableComponent setSearch={this.setSearch} onSelectedRowsHandler={this.onSelectedRowsHandler} data={this.state._display} cols={columns} expandableRows={true}  expandableRowsComponent={<ExpandableComponent />} title="Daftar Soal"/>}
+                                    {this.state.loading?  <span> <span className="fas fa-spinner spinning"></span> Loading...</span>:<TableComponent onSelectedRowsHandler={this.onSelectedRowsHandler} data={this.state._display} cols={columns} expandableRows={true}  expandableRowsComponent={<ExpandableComponent />} title="Daftar Soal"/>}
                             </div>
                         </div>
                     </div>

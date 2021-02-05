@@ -4,6 +4,7 @@ module.exports = class QuestionSpecificCompetency{
         this.question_id = question_id
         this.specific_id = specific_id
 
+        this.specificCompetency    = null 
         this.question    = null
     }
 

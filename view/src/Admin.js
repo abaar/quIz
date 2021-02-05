@@ -15,6 +15,7 @@ import KompetensiDasarContainer from "./container/Admin/KompetensiDasarContainer
 import IndikatorContainer from "./container/Admin/IndikatorContainer/IndikatorContainer";
 import BankBacaanContainer from "./container/Admin/BankBacaanContainer/BankBacaanContainer";
 import BankSoalContainer from "./container/Admin/BankSoalContainer/BankSoalContainer";
+import UjianContainer from "./container/Admin/UjianContainer/UjianContainer";
 
 class Admin extends React.Component{
     constructor(props){
@@ -116,7 +117,7 @@ class Admin extends React.Component{
                     <IndikatorContainer key={this.state.key} remount={()=>{this.setState({key:this.state.key+1})}} navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey} downloadCSV={this.downloadCSV}></IndikatorContainer>
                 </Route>
                 <Route exact path="/admin/test">
-                    <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
+                    <UjianContainer key={this.state.key} remount={()=>{this.setState({key:this.state.key+1})}} navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey} downloadCSV={this.downloadCSV}></UjianContainer>
                 </Route>
                 <Route exact path="/admin/test/result">
                     <HomeContainer navProvider={navigations}  redirectTo={this.redirectTo} fakeAuth={this.props.fakeAuth}  onAuth={this.props.onAuth}  onActive={this.props.onActive} activeKey={this.props.activeKey}></HomeContainer>
