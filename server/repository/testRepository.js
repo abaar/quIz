@@ -2,32 +2,191 @@ const db        = require("../config/db.js")
 const Test      = require("../models/tests.js");
 const TestTaker = require("../models/testTakers.js");
 
-exports.all = () =>{
-    return new Promise((resolve, reject) => {
-        db.getConnection((err,connection) => {
-            if(err){
-                console.log(err)
-                return resolve(false)
-            }
 
-            const sql = "SELECT * FROM tests"
-            connection.query(sql, (err,result) => {
+const testRepository = {
+    all : () =>{
+        return new Promise((resolve, reject) => {
+            db.getConnection((err,connection) => {
+                if(err){
+                    console.log(err)
+                    return resolve(false)
+                }
+    
+                const sql = "SELECT * FROM tests"
+                connection.query(sql, (err,result) => {
+                    if(err){
+                        console.log(err)
+                        return resolve(false)
+                    }
+    
+                    const res = []
+                    result.forEach(element => {
+                        res.push(new Test(element.id, element.code, element.type, element.title, element.description, element.topic_id, element.subject_id, element.date, element.start, element.end, element.treshold_code, element.subclass_id, element.class_id, element.school_id, element.randomquestion, element.randomanswers))
+                    });
+    
+                    connection.release()
+                    return resolve(res)
+                })
+            })
+        })
+    },
+    store : (test) => {
+        return new Promise((resolve,reject) =>{
+            db.getConnection((err,connection) => {
+                if(err){
+                    console.log(err)
+                    return resolve(false)
+                }
+    
+                var codeExist = true
+    
+                    let code           = '';
+                    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    let charactersLength = characters.length;
+                    for ( let i = 0; i < 5; i++ ) {
+                        code += characters.charAt(Math.floor(Math.random() * charactersLength));
+                    }
+                    const sql = "SELECT code FROM tests WHERE code = ?"
+                    connection.query(sql, [code], (err,result)=>{
+                        if(err){
+                            console.log(err)
+                            resolve(false)
+                        }
+    
+                        if(result.length === 0){
+                            codeExist = false
+                            const sql = "INSERT INTO tests(title, type, code, description, topic_id, subject_id, date, start, end, treshold_code, subclass_id, class_id, school_id, randomquestion, randomanswers) VALUE (?)"
+    
+                            connection.query(sql, [[test.title, test.type, code, test.description, test.topic_id, test.subject_id, test.date, test.start, test.end, test.treshold_code, test.subclass_id, test.class_id, test.school_id, test.randomquestion, test.randomanswers]], (err,result) => {
+                                if(err){
+                                    console.log(err)
+                                    resolve(false)
+                                }
+    
+                                resolve(true)
+                            })
+                        }else{
+                            return testRepository.store(test)
+                        }
+                    connection.release()
+                })
+            })
+        })
+    },
+    update : (test) =>{
+        return new Promise((resolve,reject)=>{
+            db.getConnection((err, connection) => {
                 if(err){
                     console.log(err)
                     return resolve(false)
                 }
 
-                const res = []
-                result.forEach(element => {
-                    res.push(new Test(element.id, element.code, element.type, element.title, element.description, element.topic_id, element.subject_id, element.date, element.start, element.end, element.treshold_code, element.subclass_id, element.class_id, element.school_id, element.randomquestion, element.randomanswers))
-                });
+                const sql = "UPDATE tests set title = ?, type = ?, description = ?, topic_id =?, subject_id =? , date =? , start = ? , end =? , treshold_code = ? , subclass_id = ? , class_id =? , school_id =? , randomquestion =? , randomanswers =? WHERE id =?"
+                connection.query(sql, [test.title, test.type , test.description , test.topic_id , test.subject_id , test.date, test.start, test.end, test.treshold_code, test.subclass_id, test.class_id , test.school_id, test.randomquestion, test.randomanswers, test.id], (err,result)=>{
+                    if(err){
+                        console.log(err)
+                        return resolve(false)
+                    }
 
-                connection.release()
-                return resolve(res)
+                    connection.release()
+                    return resolve(true)
+                })
             })
         })
-    })
+    },
+    insertQuestion : (test_id, questions_id ) =>{
+        return new Promise((resolve,reject)=>{
+            db.getConnection((err,connection) => {
+                if(err){
+                    console.log(err)
+                    return resolve(false)
+                }
+
+                connection.beginTransaction((err)=>{
+                    if(err){
+                        console.log(err)
+                        return connection.rollback(() => {
+                            return reject(false)
+                        });
+                    }
+                    // delete first
+                    const sql = "DELETE FROM test_questions where test_id = ?"
+                    connection.query(sql, [test_id], (err, result)=>{
+                        if(err){
+                            console.log(err)
+                            return connection.rollback(() => {
+                                return reject(false)
+                            });
+                        }
+
+                        const new_questions = []
+                        questions_id.forEach(element => {
+                            new_questions.push([test_id, element])
+                        })
+
+                        console.log(new_questions)
+
+                        if(new_questions.length === 0){
+                            connection.commit((err) => {
+                                if (err) {
+                                    return connection.rollback(() => {
+                                        return reject(false)
+                                    });
+                                }
+                                connection.release()
+                                return resolve(true)
+                            })
+                        }
+
+                        const sql = "INSERT INTO test_questions(test_id, question_id) VALUES ?"
+                        connection.query(sql, [new_questions], (err,result)=>{
+                            if(err){
+                                console.log(err)
+                                return connection.rollback(() => {
+                                    return reject(false)
+                                });
+                            }
+
+                            connection.commit((err) => {
+                                if (err) {
+                                    return connection.rollback(() => {
+                                        return reject(false)
+                                    });
+                                }
+                                connection.release()
+                                return resolve(true)
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    },
+    destroy : (value_ids) => {
+        return new Promise((resolve,reject)=>{
+            db.getConnection((err,connection)=>{
+                if(err) {
+                    return resolve(false);
+                }
+    
+                const sql = `DELETE FROM tests WHERE id in (?)`;
+                connection.query(sql,[value_ids],(err, result)=>{
+                    if(err) 
+                        return resolve(false);
+                    
+                    connection.release()
+                    return resolve(true);
+                })
+            })
+        })
+    }
 }
+
+exports.all     = testRepository.all
+exports.store   = testRepository.store
+exports.update  = testRepository.update
+exports.insertQuestion = testRepository.insertQuestion
+exports.destroy  = testRepository.destroy
 
 exports.getById = (id, withQuestionId = false, withTestTaker = false) => {
     return new Promise((resolve, reject) =>{
@@ -143,7 +302,7 @@ exports.getQuestionIds = (id) => {
                     throw err
                 }
 
-                let sql = "SELECT * FROM test_questions WHERE test_id = ?"
+                let sql = "SELECT question_id FROM test_questions WHERE test_id = ?"
                 connection.query(sql, [id], (err, result)=>{
                     if(!result){
                         result = []
@@ -152,7 +311,7 @@ exports.getQuestionIds = (id) => {
                     holder = []
 
                     for( let i = 0 ; i < result.length ; ++i){
-                        holder.push(result[i])
+                        holder.push(result[i].question_id)
                     }
                     connection.release()
                     return resolve(holder);

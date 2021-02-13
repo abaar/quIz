@@ -210,7 +210,7 @@ exports.destroy = (value_ids)=>{
     })
 }
 
-exports.getQuestionByTest = (test, id = null) =>{
+exports.getQuestionByTest = (test, id = null, specific=false) =>{
     return new Promise((resolve,reject) => {
         try{
             db.getConnection((err,connection)=>{
@@ -259,8 +259,21 @@ exports.getQuestionByTest = (test, id = null) =>{
                                 question_obj[result[i].id].addAnswer(new QuestionAnswers(result[i].answer_id, result[i].id, result[i].answer_label,null))
                             }
 
-                            connection.release()
-                            return resolve(Object.values(question_obj))
+                            if(specific){
+
+                                sql = "SELECT id, question_id, specific_id FROM question_specific_competencies WHERE id in (?)"
+                                connection.query(sql , [testQuestion], (err,result)=>{
+                                    for(let i =0 ; i < result.length; ++i){
+                                        const qspecific = new QuestionSpecificCompetency(result[i].id, result[i].question_id , result[i].specific_id)
+                                        question_obj[result[i].question_id].addSpecificCompetency(qspecific)
+                                    }
+                                    connection.release()
+                                    return resolve(Object.values(question_obj))
+                                })
+                            }else{
+                                connection.release()
+                                return resolve(Object.values(question_obj))
+                            }
                         })
                     }
                 }else{

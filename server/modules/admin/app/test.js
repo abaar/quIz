@@ -3,14 +3,24 @@ const repo  = require("../../../repository/testRepository.js")
 const repoSubclass  = require("../../../repository/subclassRepository.js")
 const repoClass     = require("../../../repository/classRepository.js")
 const repoSchool    = require("../../../repository/schoolRepository.js")
-const repoTopic  = require("../../../repository/topicRepository.js")
-const repoSubject  = require("../../../repository/subjectRepository")
+const repoTopic     = require("../../../repository/topicRepository.js")
+const repoSubject   = require("../../../repository/subjectRepository")
+const repoQuestion  = require("../../../repository/questionRepository.js")
 
 const Topic   = require("../../../models/topics.js")
 const Subject   = require("../../../models/subjects.js")
 const School    = require("../../../models/school.js")
 const Class     = require("../../../models/class.js")
 const Subclass  = require("../../../models/subclass.js")
+const Test  = require("../../../models/tests.js")
+
+
+const CoreCompetency = require("../../../models/coreCompetency.js")
+const BaseCompetency = require("../../../models/baseCompetency.js")
+const SpecificCompetency = require("../../../models/specificCompetency.js")
+const Question = require("../../../models/questions")
+const QuestionAnswers   = require("../../../models/questionAnswers");
+const QuestionSpecificCompetency = require('../../../models/questionSpecificCompetencies.js')
 
 const algos = JSON.parse(process.env.ALGOCODE)
 
@@ -68,7 +78,7 @@ exports.all = (req, res)=>{
 
             for (let i = 0 ; i < tests.length; ++i){
                 if(tests[i].subject_id !== null){
-                    tests[i].setSubject(new Subject(tests[i].subject_id, school_obj[tests[i].subject_id].name))
+                    tests[i].setSubject(new Subject(tests[i].subject_id, subject_obj[tests[i].subject_id].name))
                 }
 
                 if(tests[i].topic_id !== null){
@@ -88,6 +98,7 @@ exports.all = (req, res)=>{
                 }
                 
                 tests[i].treshold = algos[tests[i].treshold_code]
+
             }
 
                 res.send({
@@ -128,40 +139,104 @@ exports.all = (req, res)=>{
 }
 
 exports.detail = (req,res) =>{
-    const { test_id } = req.body
+    const { test_id } = req.query
     try{
-
+        repo.getQuestionIds(test_id).then((question_ids)=>{
+            res.send({
+                status  : true,
+                data    : {
+                    questions : question_ids,
+                }
+            });  
+        })
     }catch(err){
-
+        res.send({
+            status  : false,
+            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        });  
     }
 }
 
 exports.store = (req,res) => {
-    const {matpel} = req.body
+    const {value} = req.body
     try{
-        // if(matpel.matpel === null || matpel.matpel === ""){
-        //     res.send({
-        //         status  : false,
-        //         message : "Mata Pelajaran tidak boleh kosong!"
-        //     }); 
+        if(value.title === null || value.title.length === 0 ){
+            res.send({
+                status  : false,
+                message : "Judul Ujian tidak boleh kosong!"
+            }); 
+            return
+        }else if(value.type === 1 ){
+            if(value.treshold_code === null){
+                res.send({
+                    status  : false,
+                    message : "Tipe Treshold/Algo tidak boleh kosong!"
+                }); 
+                return
+            }
+            
+            if(value.subject_id === null){
+                res.send({
+                    status  : false,
+                    message : "Mata Pelajaran tidak boleh kosong!"
+                }); 
+                return
+            }
 
-        //     return
-        // }
+            if(value.topic_id === null){
+                res.send({
+                    status  : false,
+                    message : "Topik tidak boleh kosong!"
+                }); 
+                return
+            }
 
-        // repo.store(new Subject(null, matpel.matpel)).then((result)=>{
-        //     if(result){
-        //         res.send({
-        //             status  : true,
-        //             message : "Berhasil menambahkan data!"
-        //         })
-        //     }else{
-        //         res.send({
-        //             status  : false,
-        //             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
-        //         })
-        //     }
-        // })
+            value.date = (value.date == "" && value.date.length == 0)? null : value.date
+            value.start = (value.start == "" && value.start.length == 0)? null : value.start
+            value.end = (value.end == "" && value.end.length == 0)? null : value.end
+        }else if(value.type === 0){
+            if(value.date === null || value.date.length ===0){
+                res.send({
+                    status  : false,
+                    message : "Tanggal Ujian tidak boleh kosong!"
+                }); 
+                return
+            }
+
+            if(value.start === null || value.start.length === 0){
+                res.send({
+                    status  : false,
+                    message : "Jam Mulai Ujian tidak boleh kosong!"
+                }); 
+                return
+            }
+
+            if(value.end === null || value.end.length === 0){
+                res.send({
+                    status  : false,
+                    message : "Jam Selesai Ujian tidak boleh kosong!"
+                }); 
+                return
+            }
+        }
+
+        const test = new Test(value.id, null, value.type, value.title, value.description, 
+            value.topic_id , value.subject_id, value.date, value.start, value.end, value.treshold_code,
+            value.subclass_id, value.class_id, value.school_id, value.randomquestion, value.randomanswers )
         
+        repo.store(test).then((result)=>{
+            if(result){
+                res.send({
+                    status  : true,
+                    message : "Berhasil menambahkan data!"
+                })
+            }else{
+                res.send({
+                    status  : false,
+                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                })
+            }
+        })
     }catch(err){
         res.send({
             status  : false,
@@ -171,32 +246,93 @@ exports.store = (req,res) => {
 }
 
 exports.update = (req,res) =>{
-    const {matpel} = req.body
+    const {value} = req.body
     try{
-        // if(matpel.matpel === null || matpel.matpel === ""){
-        //     res.send({
-        //         status  : false,
-        //         message : "Mata Pelajaran tidak boleh kosong!"
-        //     }); 
 
-        //     return
-        // }
+        console.log(value)
+        if(value.title === null || value.title.length === 0 ){
+            res.send({
+                status  : false,
+                message : "Judul Ujian tidak boleh kosong!"
+            }); 
+            return
+        }else if(value.type === 1 ){
+            if(value.treshold_code === null){
+                res.send({
+                    status  : false,
+                    message : "Tipe Treshold/Algo tidak boleh kosong!"
+                }); 
+                return
+            }
+            
+            if(value.subject_id === null){
+                res.send({
+                    status  : false,
+                    message : "Mata Pelajaran tidak boleh kosong!"
+                }); 
+                return
+            }
 
-        // repo.update(new Subject(matpel.id, matpel.matpel)).then((result)=>{
-        //     if(result){
-        //         res.send({
-        //             status  : true,
-        //             message : "Berhasil menyimpan data!"
-        //         })
-        //     }else{
-        //         res.send({
-        //             status  : false,
-        //             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
-        //         })
-        //     }
-        // })
-        
+            if(value.topic_id === null){
+                res.send({
+                    status  : false,
+                    message : "Topik tidak boleh kosong!"
+                }); 
+                return
+            }
+
+            value.date = (value.date == "" && value.date.length == 0)? null : value.date
+            value.start = (value.start == "" && value.start.length == 0)? null : value.start
+            value.end = (value.end == "" && value.end.length == 0)? null : value.end
+        }else if(value.type === 0){
+            if(value.date === null || value.date.length ===0){
+                res.send({
+                    status  : false,
+                    message : "Tanggal Ujian tidak boleh kosong!"
+                }); 
+                return
+            }
+
+            if(value.start === null || value.start.length === 0){
+                res.send({
+                    status  : false,
+                    message : "Jam Mulai Ujian tidak boleh kosong!"
+                }); 
+                return
+            }
+
+            if(value.end === null || value.end.length === 0){
+                res.send({
+                    status  : false,
+                    message : "Jam Selesai Ujian tidak boleh kosong!"
+                }); 
+                return
+            }
+        }
+
+        const test = new Test(value.id, value.code, value.type, value.title, value.description, 
+            value.topic_id , value.subject_id, value.date, value.start, value.end, value.treshold_code,
+            value.subclass_id, value.class_id, value.school_id, value.randomquestion, value.randomanswers )
+        repo.update(test).then((result)=>{
+            if(result){
+                res.send({
+                    status  : true,
+                    message : "Berhasil menyimpan data!"
+                })
+            }else{
+                res.send({
+                    status  : false,
+                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                })
+            }
+        })
+
+        // res.send({
+        //     status  : false,
+        //     message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        // }); 
     }catch(err){
+        console.log(err)
         res.send({
             status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
@@ -205,21 +341,45 @@ exports.update = (req,res) =>{
 }
 
 exports.destroy = (req,res) => {
-    const {matpel_ids } = req.body
+    const {value_ids} = req.body
     try{
-        // repo.destroy(matpel_ids).then((result)=>{
-        //     if(result){
-        //         res.send({
-        //             status  : true,
-        //             message : "Berhasil menghapus data!"
-        //         })
-        //     }else{
-        //         res.send({
-        //             status  : false,
-        //             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
-        //         }); 
-        //     } 
-        // })
+        repo.destroy(value_ids).then((result)=>{
+            if(result){
+                res.send({
+                    status  : true,
+                    message : "Berhasil menghapus data!"
+                })
+            }else{
+                res.send({
+                    status  : false,
+                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                }); 
+            } 
+        })
+    }catch(err){
+        res.send({
+            status  : false,
+            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+        }); 
+    }
+}
+
+exports.question = (req,res) =>{
+    const { test_id, questions } = req.body
+    try{
+        repo.insertQuestion(test_id, questions).then((result)=>{
+            if(result){
+                res.send({
+                    status  : true,
+                    message : "Berhasil menyimpan data!"
+                })
+            }else{
+                res.send({
+                    status  : false,
+                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                })
+            }
+        })
     }catch(err){
         res.send({
             status  : false,

@@ -39,12 +39,14 @@ class TableComponent extends React.Component{
                 </div>
                 <DataTable
                     overflowY={true}
-                    pagination={true}
+                    
+                    pagination={("pagination" in this.props)?this.props.pagination:true}
                     title={this.props.title}
                     columns={this.props.cols}
                     data={this.props.data}
                     selectableRows={true}
                     onSelectedRowsChange={this.props.onSelectedRowsHandler}
+                    selectableRowSelected={("preselect" in this.props)? this.props.preselect: false}
                     expandableRows={("expandableRows" in this.props)}
                     expandableRowsComponent={("expandableRows" in this.props)?this.props.expandableRowsComponent:<span></span>}
                     />

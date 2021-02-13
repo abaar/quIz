@@ -11,4 +11,7 @@ router.post("/store", [verifyToken, verifyAdmin], testController.store)
 router.post("/update", [verifyToken, verifyAdmin], testController.update)
 router.post("/destroy", [verifyToken, verifyAdmin], testController.destroy)
 
+router.get("/detail", [verifyToken, verifyAdmin], testController.detail)
+router.post("/question", [ verifyToken, verifyAdmin], testController.question)
+
 module.exports  = router

@@ -11,6 +11,24 @@ import withReactContent from 'sweetalert2-react-content'
 import 'katex/dist/katex.min.css';
 import { BlockMath } from 'react-katex';
 
+const columnSoal = [
+    {
+      name: '#',
+      selector: 'index',
+      sortable: false,
+      maxWidth:"50px",
+      minWidth:"10px"
+    },
+    {
+      name: 'Soal',
+      cell: row => <div data-tag="allowRowEvents">{(row.is_katex === 1? row.katek:row.label)}</div>,
+    },
+    {
+      name : "Komponen Foto",
+      cell : row => <div data-tag="allowRowEvents">{(row.image === null)? "-": <img src={row.image} alt={"Soal " + row.label}/>}</div>
+    },
+  ];
+
 // const data = [{ id: 1, title: 'Conan the Barbarian',  title2: 'Conan the Barbarian', year: '1982' }];
 const columns = [
   {
@@ -41,21 +59,6 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'Waktu',
-    selector: 'date',
-    sortable: true,
-  },
-  {
-    name: 'Random Soal',
-    selector: 'randomques',
-    sortable: true,
-  },
-  {
-    name: 'Random Jawaban',
-    selector: 'randomansw',
-    sortable: true,
-  },
-  {
     name: 'Treshold',
     selector: 'treshold',
     sortable: true,
@@ -79,7 +82,16 @@ const columns = [
 ];
 const swalinstance = withReactContent(Swal)
 
-const ExpandableComponent = ({ data }) => <span>asdasd</span>
+const ExpandableComponent = ({ data }) => <ul>
+        <li>Tanggal : {(data.date===null)? "Sewaktu-waktu / Adaptif" :data.date_str}</li>
+        <li>Deskripsi : {data.description} </li>
+        <li>Soal Random/Urut : {data.randomques}</li>
+        <li>Jawaban Random/Urut : {data.randomansw}</li>
+    </ul>
+
+const ExpandableSoalComponent = ({ data }) => <span> {(data.specific_raw.length !== 0)?data.specific:""} <br/> {(data.answers)}</span>
+
+const rowSelectCritera = row => row.selected;
 
 class UjianContainer extends React.Component{
     
@@ -125,6 +137,7 @@ class UjianContainer extends React.Component{
             },
             value : {
                 id          : "",
+                code        : null,
                 type        : null,
                 title       : "",
                 description : "",
@@ -140,6 +153,11 @@ class UjianContainer extends React.Component{
                 randomanswer    : false,
                 randomquestion  : false,
             },
+            loadingSoal : false,
+            kelolaSoals : [],
+            kololaSoals_ : [],
+            idSoalAdd : [],
+            modalkelolasoal : false,
         }
 
         this.subjectref = React.createRef()
@@ -190,6 +208,24 @@ class UjianContainer extends React.Component{
                 }
 
                 for(let i =0 ; i < tests.length; ++i){
+                    let date_str = null;
+                    if(tests[i].date !== null){
+
+                        const currentdate = new Date(tests[i].date)
+                        
+                        let month = currentdate.getMonth()
+                        let date  = currentdate.getDate()
+                        if(month < 10){
+                            month = "0"+month
+                        }
+                        
+                        if(date < 10){
+                            date = "0"+date
+                        }
+                        date_str = date+"/"+month+"/"+currentdate.getFullYear() +" | " + tests[i].start +" s/d " + tests[i].end
+                    }
+                        
+
                     _datas.push({
                         index       : (i+1),
                         id          : tests[i].id,
@@ -203,6 +239,7 @@ class UjianContainer extends React.Component{
                         subject_id  : tests[i].subject_id,
                         subject     : (tests[i].subject_id)?tests[i].subject.name:"-",
                         date        : tests[i].date,
+                        date_str    : date_str,
                         start       : tests[i].start,
                         end         : tests[i].end,
                         treshold_code : tests[i].treshold_code,
@@ -287,15 +324,84 @@ class UjianContainer extends React.Component{
     }
 
     onEditHandler = () => {
-        // const data = this.state.select.subjects.data
-        this.setState({
+        const data =  this.state.selectedRows[0]
+        
+        const school    = this.state.select.school.data
+        let class_    = []
+        let subclass  = []
+        const subject   = this.state.select.subject.data
+        let topic     = []
 
+        if(data.subject_id !== null){
+            for(let i =0 ; i < subject.length ; ++i){
+                if(subject[i].value === data.subject_id){
+                    topic = subject[i].topics
+                }
+            }
+        }
+
+        if(data.school_id !== null){
+            for(let i = 0 ; i < school.length ; ++i){
+                if(data.school_id === school[i].value){
+                    class_ = school[i].class
+                    if(data.class_id !== null){
+                        for (let j =0 ; j < class_.length ; ++j){
+                            if(class_[j].id === data.class_id){
+                                subclass = class_[j].subclass
+                                break
+                            }
+                        }
+                    }
+                    break
+                }
+            }
+        }
+
+        let date_str = data.date;
+        if(data.data !== null){
+            const currentdate = new Date(data.date)
+            let month = currentdate.getMonth()
+            let date  = currentdate.getDate()
+            if(month < 10){
+                month = "0"+month
+            }
+            
+            if(date < 10){
+                date = "0"+date
+            }
+
+            date_str = currentdate.getFullYear()+"-"+month+"-"+date;
+        }
+
+        this.setState({
+            modaladd : true,
+            overrideadd : true,
+            value : {
+                id          : data.id,
+                type        : {value: data.type, label :data.type_str},
+                code        : data.code,
+                title       : data.title,
+                description : data.description,
+                topic       : (data.topic_id === null)? null: {value:data.topic_id, label:data.topic},
+                subject     : (data.subject_id === null)? null: {value:data.subject_id, label:data.subject, topics : topic},
+                date        : date_str,
+                start       : data.start,
+                end         : data.end,
+                treshold    : (data.treshold_code === null)? null : {value:data.treshold_code, label :data.treshold},
+                school      : (data.school_id === null)? null: { value:data.school_id, label :data.school, class: class_},
+                class       : (data.class_id === null)? null : {value : data.class_id, label: data.class , subclass : subclass}, 
+                subclass    : (data.subclass_id === null )? null : {value: data.subclass_id, label : data.subclass},
+                randomanswer    : data.randomansw === "Random"? true:false,
+                randomquestion  : data.randomques === "Random"? true:false,
+            }
         }, () =>{
-            this.subjectref.current.select.setValue(this.state.value.subject, 'set-value') 
-            this.topicref.current.select.setValue(this.state.value.topic, 'set-value')
-            this.schoolref.current.select.setValue(this.state.value.core, 'set-value')          
-            this.classref.current.select.setValue(this.state.value.base , "set-value") 
-            this.subclassref.current.select.setValue(this.state.value.specific , "set-value") 
+            this.subjectref.current.select.setValue(this.state.value.subject)
+            this.topicref.current.select.setValue(this.state.value.topic)
+            this.schoolref.current.select.setValue(this.state.value.school)
+            this.classref.current.select.setValue(this.state.value.class)
+            this.subclassref.current.select.setValue(this.state.value.subclass)
+            this.typeref.current.select.setValue(this.state.value.type)
+            this.tresholdref.current.select.setValue(this.state.value.treshold)
         })
     }
 
@@ -319,14 +425,89 @@ class UjianContainer extends React.Component{
                 subclass    : null,
                 randomanswer    : false,
                 randomquestion  : false,
-            }
+            },
+            modalkelolasoal : false,
         }, ()=>{
+            
             this.subjectref.current.select.clearValue()
             this.topicref.current.select.clearValue()
-            this.coreref.current.select.clearValue()
-            this.baseref.current.select.clearValue()
-            this.specificref.current.select.clearValue()
+            this.schoolref.current.select.clearValue()
+            this.classref.current.select.clearValue()
+            this.subclassref.current.select.clearValue()
+            this.typeref.current.select.clearValue()
+            this.tresholdref.current.select.clearValue()
 
+        })
+    }
+
+    updateUjian = () =>{
+        if(this.state.value.title === "" || this.state.value.title === null){
+            swalinstance.fire({title:"Judul Ujian tidak boleh kosong!", icon:"error"})
+            return
+        }
+        else{
+            this.setState({
+                addsubmitting:true
+            })
+            const value = this.state.value
+            const valuex = {
+                id : value.id,
+                title : value.title,
+                code : value.code,
+                type  : value.type,
+                description : value.description,
+                topic_id : (value.topic !== null)?value.topic.value : null,
+                subject_id : (value.subject !== null)? value.subject.value : null,
+                date : value.date,
+                start : value.start,
+                end : value.end,
+                treshold_code : (value.treshold !== null)? value.treshold.value : null,
+                subclass_id : (value.subclass !== null)? value.subclass.value : null,
+                class_id    : (value.class !== null)? value.class.value : null,
+                school_id : (value.school !== null)? value.school.value :null,
+                randomquestion : value.randomquestion,
+                randomanswers : value.randomanswer,
+            }
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+            axios.post("/admin/test/update",{
+                value:valuex
+            },
+            {withCredentials:true}).then((res)=>{
+                this.setState({
+                    addsubmitting:false,
+                })
+                if(res.data.status){
+                    swalinstance.fire({title:"Berhasil", text:res.data.message, icon:"success"}).then(()=>{
+                        this.props.remount()
+                    })
+                }else{
+                    swalinstance.fire({title:"Gagal", text:res.data.message, icon:"error"})
+                }
+            })
+        }
+    }
+
+    submitSoalUjian = () =>{
+        this.setState({
+            addsubmitting:true
+        })
+
+        axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+        axios.post("/admin/test/question",{
+            test_id :this.state.selectedRows[0].id,
+            questions : this.state.idSoalAdd
+        }, {withCredentials : true}).then((res)=>{
+            this.setState({
+                addsubmitting:false,
+            })
+            if(res.data.status){
+                swalinstance.fire({title:"Berhasil", text:res.data.message, icon:"success"}).then(()=>{
+                    this.props.remount()
+                })
+            }else{
+                swalinstance.fire({title:"Gagal", text:res.data.message, icon:"error"})
+            }
         })
     }
 
@@ -339,31 +520,51 @@ class UjianContainer extends React.Component{
             this.setState({
                 addsubmitting:true
             })
-
             const value = this.state.value
-            console.log(value)
+            const valuex = {
+                id : value.id,
+                title : value.title,
+                type  : value.type,
+                description : value.description,
+                topic_id : (value.topic !== null)?value.topic.value : null,
+                subject_id : (value.subject !== null)? value.subject.value : null,
+                date : value.date,
+                start : value.start,
+                end : value.end,
+                treshold_code : (value.treshold !== null)? value.treshold.value : null,
+                subclass_id : (value.subclass !== null)? value.subclass.value : null,
+                class_id    : (value.class !== null)? value.class.value : null,
+                school_id : (value.school !== null)? value.school.value :null,
+                randomquestion : value.randomquestion,
+                randomanswers : value.randomanswer,
+            }
 
-            // axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-            // axios.post("/admin/question/question/store",{
-            //     value:valuex
-            // },
-            // {withCredentials:true}).then((res)=>{
-            //     this.setState({
-            //         addsubmitting:false,
-            //     })
-            //     if(res.data.status){
-            //         swalinstance.fire({title:"Berhasil", text:res.data.message, icon:"success"}).then(()=>{
-            //             this.props.remount()
-            //         })
-            //     }else{
-            //         swalinstance.fire({title:"Gagal", text:res.data.message, icon:"error"})
-            //     }
-            // })
+            axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+            axios.post("/admin/test/store",{
+                value:valuex
+            },
+            {withCredentials:true}).then((res)=>{
+                this.setState({
+                    addsubmitting:false,
+                })
+                if(res.data.status){
+                    swalinstance.fire({title:"Berhasil", text:res.data.message, icon:"success"}).then(()=>{
+                        this.props.remount()
+                    })
+                }else{
+                    swalinstance.fire({title:"Gagal", text:res.data.message, icon:"error"})
+                }
+            })
         }
     }
 
     onUpdateHandler = () =>{
-      
+        if(this.state.modalkelolasoal === true){
+            this.submitSoalUjian()
+        }
+        else{
+            this.updateUjian()
+        }
     }
 
     onDeleteHandler = () =>{
@@ -386,7 +587,7 @@ class UjianContainer extends React.Component{
                 }
 
                 axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-                axios.post("/admin/question/question/destroy",{
+                axios.post("/admin/test/destroy",{
                     value_ids:value_ids
                 },
                 {withCredentials:true}).then((res)=>{
@@ -417,7 +618,6 @@ class UjianContainer extends React.Component{
         })
     }
 
-
     onValueChange = (name, event) =>{
         const value = this.state.value
         value[name] = event.target.value
@@ -436,13 +636,10 @@ class UjianContainer extends React.Component{
         })
     }
 
-
     onSelectChangeHandler = (name, value) =>{
         const curvalue = this.state.value
         const select   = this.state.select
         if(name === "school"){
-            this.classref.current.select.clearValue()
-            this.subclassref.current.select.clearValue()
             curvalue.school = value
 
             let classes = []
@@ -451,6 +648,9 @@ class UjianContainer extends React.Component{
                 curvalue.school   = null
                 curvalue.class    = null
                 curvalue.subclass = null
+                this.classref.current.select.clearValue()
+                this.subclassref.current.select.clearValue()
+
                 select.class = {
                     disabled : true,
                     loading  : true,
@@ -463,13 +663,23 @@ class UjianContainer extends React.Component{
                     data     : [],
                 }
             }else{
+                let clear_class = true
                 value.class.forEach(element =>{
+                    if(this.state.value.class != null && this.state.value.class.value === element.id){
+                        clear_class = false
+                    }
+
                     classes.push({
                         value    : element.id,
                         label    : element.name,
                         subclass : element.subclass,
                     })
                 })
+
+                if(clear_class){
+                    this.classref.current.select.clearValue()
+                    this.subclassref.current.select.clearValue()
+                }
 
                 select.class = {
                     disabled : false,
@@ -490,10 +700,10 @@ class UjianContainer extends React.Component{
             })
 
         }else if(name === "class"){
-            this.subclassref.current.select.clearValue()
             curvalue.class  = value
 
             if( value === null ){
+                this.subclassref.current.select.clearValue()
                 select.subclass = {
                     disabled : true,
                     loading  : true,
@@ -501,12 +711,23 @@ class UjianContainer extends React.Component{
                 }
             }else{
                 let subclass = []
+                let clear_subclass = true
+
                 value.subclass.forEach(element =>{
+
+                    if(this.state.value.subclass != null && element.id === this.state.value.subclass.value){
+                        clear_subclass = false
+                    }
+
                     subclass.push({
                         value    : element.id,
                         label    : element.name,
                     })
                 })
+
+                if(clear_subclass){
+                    this.subclassref.current.select.clearValue()
+                }
 
                 select.subclass = {
                     disabled : false,
@@ -525,8 +746,7 @@ class UjianContainer extends React.Component{
                 value : curvalue,
             })
         }else if(name === "subject"){
-            this.topicref.current.select.clearValue()
-            curvalue.topic = value
+            curvalue.subject = value
             
             if(value === null){
                 select.topic = {
@@ -537,9 +757,18 @@ class UjianContainer extends React.Component{
             }else{
                 let topics = []
 
+                let clear_topic = true
                 value.topics.forEach(element => {
+                    if(this.state.value.topic != null &&element.id === this.state.value.topic.value){
+                        clear_topic = false
+                    }
+
                     topics.push({value : element.id, label : element.name})
                 })
+
+                if(clear_topic){
+                    this.topicref.current.select.clearValue()
+                }
 
                 select.topic = {
                     disabled : false,
@@ -559,12 +788,17 @@ class UjianContainer extends React.Component{
                 value : curvalue,
             })
         }else if(name === "type"){
-            if(value.value === 0){
+            if(value != null && value.value === 1){
                 select.algo = {
                     disabled : false,
                     loading  : false,
                     data     : this.state.select.algo.data,
                 }
+
+                curvalue.date   = ""
+                curvalue.start  = ""
+                curvalue.end    = ""
+
             }else{
                 this.tresholdref.current.select.clearValue()
                 select.algo = {
@@ -572,8 +806,9 @@ class UjianContainer extends React.Component{
                     loading  : true,
                     data     : this.state.select.algo.data,
                 }
+
             }
-            curvalue.type = value.value
+            curvalue.type = (value!=null)? value.value:null
             this.setState({
                 value : curvalue,
                 select: select
@@ -586,6 +821,85 @@ class UjianContainer extends React.Component{
         }
     }
 
+    onKelolaSoal = ()=>{
+
+        if(this.state.selectedRows.length === 0 || this.state.selectedRows.length > 1){
+            swalinstance.fire({title:"Pilihlah ujian terlebih dahulu! Harus satu!", icon:"error"})
+            return
+        }
+
+        this.setState({
+            modalkelolasoal: true,
+            loadingSoal : true
+        })
+
+        axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
+        const fetchAllQuestion =  axios.get("/admin/question/question/all",{},{withCredentials:true})
+        const fetchCurrentid   =  axios.get("/admin/test/detail?test_id="+this.state.selectedRows[0].id ,{}, {withCredentials:true})
+
+        console.log(fetchCurrentid)
+
+        Promise.all([
+            fetchAllQuestion,
+            fetchCurrentid
+        ]).then((res)=>{
+            let {questions } = res[0].data.data
+            const current_questions = res[1].data.data.questions
+            const current_questions_obj = {}
+            current_questions.forEach(element => {
+                current_questions_obj[element] = true
+            })
+
+            const _datas = []
+            for(let i =0 ; i < questions.length; ++i){
+                const answers = []
+                for( let j =0 ; j <questions[i].answers.length; ++j){
+                    answers.push(<li key={j+1} style={{ listStyle:"none" }}> {"Pilihan " + (j+1) +" => "} {questions[i].answers[j].label}</li>) 
+                }
+
+                const specifics = []
+                for ( let j =0 ; j < questions[i].specificCompetencies.length; ++j){
+                    specifics.push(<li key={j+1}>{questions[i].specificCompetencies[j].description}</li>)
+                }
+
+                _datas.push({
+                    index : (i+1),
+                    id : questions[i].id,
+                    image : questions[i].path_image,
+                    is_katex : questions[i].is_katex,
+                    katek : <BlockMath math={questions[i].question} renderError={(error) => {
+                        return <b>TeX Salah!: {error.name}</b>
+                    }}/>,
+                    label : questions[i].question,
+                    answers : <ul>{answers}</ul>,
+                    answers_raw : questions[i].answers,
+                    specific_raw : questions[i].specificCompetencies,
+                    specific : <ul>{specifics}</ul>,
+                    selected : (questions[i].id in current_questions_obj)
+                })
+            }
+
+            this.setState({
+                kelolaSoals  : _datas,
+                kelolaSoals_ : _datas,
+            },()=>{
+                this.setState({
+                    loadingSoal : false
+                })
+            })
+        })
+    }
+
+    onKelolaSoalChecked = (state) => {
+        const idSoalAdd = []
+        for(let i =0 ; i < state.selectedRows.length ; ++i){
+            idSoalAdd.push(state.selectedRows[i].id)
+        }
+
+        this.setState({
+            idSoalAdd:idSoalAdd
+        })
+    }
 
     render(){
         const home = <div className="admin-content-container">
@@ -597,6 +911,7 @@ class UjianContainer extends React.Component{
                                 </small>
                             </div>
                             <div className="admin-action">
+                                <button className={"btn btn-sm btn-outline-warning btn__table__action" + ((this.state.selectedRows.length !== 1)?" disabled":"")} onClick={this.onKelolaSoal}  disabled={(this.state.selectedRows.length !== 1)}><span className="fas fa-plus"></span> Kelola Soal</button>
                                 <button className="btn btn-sm btn-outline-primary btn__table__action" onClick={ this.onAddHandler }> <span className="fas fa-plus"></span> <span className="label">Tambah</span> </button>
                                 <button className={"btn btn-sm btn-outline-warning btn__table__action" + ((this.state.selectedRows.length !== 1)?" disabled":"")} onClick={ this.onEditHandler } disabled={(this.state.selectedRows.length !== 1)}> <span className="fas fa-edit"></span> <span className="label">Ubah</span></button>
                                 <button className={"btn btn-sm btn-outline-danger btn__table__action" + ((this.state.selectedRows.length === 0)?" disabled":"")}  onClick={ this.onDeleteHandler } disabled={(this.state.selectedRows.length ===0)}> <span className="fas fa-trash"></span> <span className="label">Hapus</span></button>
@@ -650,11 +965,35 @@ class UjianContainer extends React.Component{
             </div>
             <div className="form-group row">
                 <div className="col-3">
-                    <label htmlFor="" className="control-label">Tipe Ujian</label>
+                    <label htmlFor="" className="control-label required">Tipe Ujian</label>
                 </div>
                 <div className="col-9">
                     <Select placeholder={'Pilih Tipe Ujian...'} 
                     isClearable={true} ref={this.typeref} options={[{value:1,label:"Adaptif Assesment"}, {value:0, label:"Pilihan Ganda"}]} onChange={(value)=>{this.onSelectChangeHandler("type", value)}}></Select>
+                </div>
+            </div>
+            <div className="form-group row">
+                <div className="col-3">
+                    <label htmlFor="" className={"control-label "+(!this.state.select.algo.disabled)?" required":""}>Tanggal</label>
+                </div>
+                <div className="col-9">
+                    <input type="date" disabled={!this.state.select.algo.disabled}  value={this.state.value.date} onChange={(event)=>{this.onValueChange("date",event)}} className="form-control" placeholder="Tanggal Ujian"/>
+                </div>
+            </div>
+            <div className="form-group row">
+                <div className="col-3">
+                    <label htmlFor="" className={"control-label "+(!this.state.select.algo.disabled)?" required":""}>Mulai</label>
+                </div>
+                <div className="col-9">
+                    <input type="time" disabled={!this.state.select.algo.disabled}  value={this.state.value.start} onChange={(event)=>{this.onValueChange("start",event)}} className="form-control" placeholder="Jam Mulai Ujian"/>
+                </div>
+            </div>
+            <div className="form-group row">
+                <div className="col-3">
+                    <label htmlFor="" className={"control-label "+(!this.state.select.algo.disabled)?" required":""}>End</label>
+                </div>
+                <div className="col-9">
+                    <input type="time" disabled={!this.state.select.algo.disabled} value={this.state.value.end} onChange={(event)=>{this.onValueChange("end",event)}} className="form-control" placeholder="Jam Selesai Ujian"/>
                 </div>
             </div>
             <div className="form-group row">
@@ -673,6 +1012,7 @@ class UjianContainer extends React.Component{
                 <div className="col-9">
                     <Select placeholder={'Pilih Sekolah...'} 
                     isClearable={true} ref={this.schoolref} options={this.state.select.school.data} onChange={(value)=>{this.onSelectChangeHandler("school", value)}}></Select>
+                    <small>Kosongkan apabila Ujian hanya untuk perorangan/Remidial</small>
                 </div>
             </div>
             <div className="form-group row">
@@ -713,17 +1053,24 @@ class UjianContainer extends React.Component{
             </div>
         </span>
                 
+        const kelolaSoal = <span>
+            {(this.state.loadingSoal === true)? "Loading...":
+                <TableComponent setSearch={()=>console.log("search")} pagination={false} preselect={rowSelectCritera} onSelectedRowsHandler={this.onKelolaSoalChecked} data={this.state.kelolaSoals_} cols={columnSoal} expandableRows={true} expandableRowsComponent={<ExpandableSoalComponent/>} title="Daftar Soal" />
+            }
+        </span>
+
         const addconfirm = <button type="button" className={"btn btn-primary btn-sm"+ (this.state.addsubmitting?" disabled":"")} disabled={this.state.addsubmitting} onClick={this.onSubmithandler}> {(this.state.addsubmitting? <span><span className="fas fa-spin spinning"></span> Sedang menambahkan...</span>:"Tambah")}</button>
         const ediconfirm = <button type="button" style={{ color:"white" }} className={"btn btn-warning btn-sm"+ (this.state.addsubmitting?" disabled":"")} disabled={this.state.addsubmitting} onClick={this.onUpdateHandler}> {(this.state.addsubmitting? <span><span className="fas fa-spin spinning"></span> Sedang menyimpan...</span>:"Simpan")}</button>
         const footer     = <div className="modal-footer">
                 <button type="button" className="btn btn-secondary btn-sm" onClick={this.onAddHideHandler}>Batal</button>
-                {(this.state.overrideadd)? ediconfirm:addconfirm }
+                {(this.state.overrideadd || this.state.modalkelolasoal)? ediconfirm:addconfirm }
         </div>
 
         return(
             <span>
                 <AdminContainer content={home} fakeAuth={this.props.fakeAuth} onActive={this.props.onActive} activeKey={this.props.activeKey} onAuth={this.props.onAuth}  redirectTo={this.props.redirectTo} navProvider={this.props.navProvider} ></AdminContainer>
                 <ModalComponent title={(this.state.overrideadd === true)?"Ubah Ujian":"Tambah Ujian"} body={body} footer={footer} open={this.state.modaladd?true:false} onAddHideHandler={this.onAddHideHandler}></ModalComponent>
+                <ModalComponent title="Kelola Soal" body={kelolaSoal} open={this.state.modalkelolasoal} footer={footer} onAddHideHandler={this.onAddHideHandler}></ModalComponent>
             </span>
         )
     }
