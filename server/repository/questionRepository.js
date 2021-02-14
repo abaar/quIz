@@ -2,12 +2,12 @@ const db = require("../config/db");
 const Question = require("../models/questions")
 const QuestionAnswers   = require("../models/questionAnswers");
 const QuestionSpecificCompetency = require("../models/questionSpecificCompetencies");
-
+const fs = require("fs");
 
 exports.all = (raw = false) =>{
     return new Promise((resolve, reject) =>{
         db.getConnection((err,connection) => {
-            sql = "SELECT q.id AS id, q.passage_id as passage_id, q.path_image as path_image, q.is_katex as is_katex, q.true_count as true_count, q.false_count as false_count, q.question AS question , qa.id AS answer_id, qa.label AS answer_label, qa.is_correct as answer_correct FROM questions q INNER JOIN question_answers qa ON q.id = qa.question_id"
+            sql = "SELECT q.id AS id, q.passage_id as passage_id, q.image as image, q.is_katex as is_katex, q.true_count as true_count, q.false_count as false_count, q.question AS question , qa.id AS answer_id, qa.label AS answer_label, qa.is_correct as answer_correct FROM questions q INNER JOIN question_answers qa ON q.id = qa.question_id"
             connection.query(sql, (err,result)=>{
                 if(err){
                     console.log(err)
@@ -19,7 +19,7 @@ exports.all = (raw = false) =>{
                     const question_ids = []
                     for(let i =0 ; i < result.length ; ++i){
                         if ( question_obj[result[i].id] === undefined ){
-                            question_obj[result[i].id] = new Question(result[i].id, result[i].question, result[i].true_count, result[i].false_count, null, result[i].passage_id, result[i].path_image, result[i].is_katex)
+                            question_obj[result[i].id] = new Question(result[i].id, result[i].question, result[i].true_count, result[i].false_count, null, result[i].passage_id, result[i].image, result[i].is_katex)
                             question_ids.push(result[i].id)
                         }
 
@@ -50,15 +50,17 @@ exports.store = (questions) => {
             db.getConnection((err,connection) => {
                 if(err){
                     console.log(err)
+                    console.log("asdasd")
+
                     return resolve(false)
                 }
 
                 connection.beginTransaction((err)=>{
-                    const sql = "INSERT INTO questions(question, is_katex, passage_id, path_image) values(?,?,?,?)"
-                    connection.query(sql, [questions.question, questions.is_katex, questions.passage_id, questions.path_image], (err,results)=>{
+                    const sql = "INSERT INTO questions(question, is_katex, passage_id, image) values(?,?,?,?)"
+                    connection.query(sql, [questions.question, questions.is_katex, questions.passage_id, questions.image], (err,results)=>{
                         if(err){
                             return connection.rollback(() => {
-                                return reject(false)
+                                return resolve(false)
                             });
                         }
 
@@ -78,11 +80,12 @@ exports.store = (questions) => {
                         if(specific.length === 0){
                             const sql = "INSERT INTO question_answers(question_id, label, is_correct) VALUES ?"
                             connection.query(sql, [answers], (err,result)=>{
-                                console.log(err)
                                 connection.commit((err) => {
                                     if (err) {
+                                        console.log(err)
+                                        console.log("asdasd2")
                                         return connection.rollback(() => {
-                                            return reject(false)
+                                            return resolve(false)
                                         });
                                     }
                                     connection.release()
@@ -95,10 +98,11 @@ exports.store = (questions) => {
                                 const sql = "INSERT INTO question_specific_competencies(question_id, specific_id) VALUES ?"
                                 connection.query(sql, [specific], (err,result)=>{
                                     console.log(err)
+                                    console.log("asdasd3")
                                     connection.commit((err) => {
                                         if (err) {
                                             return connection.rollback(() => {
-                                                return reject(false)
+                                                return resolve(false)
                                             });
                                         }
                                         connection.release()
@@ -112,7 +116,7 @@ exports.store = (questions) => {
                 })
             })
         }catch(err){
-
+            console.log(err)
         }
     })
 }
@@ -127,12 +131,12 @@ exports.update = (questions) =>{
                 }
 
                 connection.beginTransaction((err)=>{
-                    const sql = "REPLACE INTO questions(id, question, is_katex, passage_id, path_image) values(?,?,?,?,?)"
-                    connection.query(sql, [ questions.id ,questions.question, questions.is_katex, questions.passage_id, questions.path_image], (err,results)=>{
+                    const sql = "REPLACE INTO questions(id, question, is_katex, passage_id, image) values(?,?,?,?,?)"
+                    connection.query(sql, [ questions.id ,questions.question, questions.is_katex, questions.passage_id, questions.image], (err,results)=>{
                         if(err){
                             console.log(err)
                             return connection.rollback(() => {
-                                return reject(false)
+                                return resolve(false)
                             });
                         }
 
@@ -156,7 +160,7 @@ exports.update = (questions) =>{
                                 connection.commit((err) => {
                                     if (err) {
                                         return connection.rollback(() => {
-                                            return reject(false)
+                                            return resolve(false)
                                         });
                                     }
                                     connection.release()
@@ -172,7 +176,7 @@ exports.update = (questions) =>{
                                     connection.commit((err) => {
                                         if (err) {
                                             return connection.rollback(() => {
-                                                return reject(false)
+                                                return resolve(false)
                                             });
                                         }
                                         connection.release()

@@ -15,6 +15,7 @@ app.use(cors({credentials: true}))
 app.use(cParser())
 app.use(express.json());
 app.use(bParser.urlencoded({extended:false, limit:"50mb"}));
+app.use(express.static(__dirname + '/public'));
 
 app.use("/admin",admins);
 app.use("/auth", auth);

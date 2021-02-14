@@ -29,11 +29,12 @@ const columns = [
   {
     name: 'Soal',
     cell: row => <div data-tag="allowRowEvents">{(row.is_katex === 1? row.katek:row.label)}</div>,
-    minWidth : "500px"
+    minWidth : "100px"
   },
   {
     name : "Komponen Foto",
-    cell : row => <div data-tag="allowRowEvents">{(row.image === null)? "-": <img src={row.image} alt={"Soal " + row.label}/>}</div>
+    // https://medium.com/@koteswar.meesala/convert-array-buffer-to-base64-string-to-display-images-in-angular-7-4c443db242cd 
+    cell : row => <div data-tag="allowRowEvents">{(row.image === null)? "-": <img width="100px" src={'data:image/jpeg;base64,' + btoa(new Uint8Array(row.image.data).reduce((data,byte)=> {return data+ String.fromCharCode(byte)},''))} alt={"Soal " + row.label}/>}</div>
   },
 ];
 const swalinstance = withReactContent(Swal)
@@ -50,6 +51,7 @@ class BankSoalContainer extends React.Component{
             modaladd : false,
             addsubmitting : false,
             overrideadd : false,
+            modaldeletefoto : false,
             select:{
                 subjects:{
                     disabled : true,
@@ -89,7 +91,10 @@ class BankSoalContainer extends React.Component{
                 specific    : null,
                 is_katex    : 0,
                 answers     : [],
+                foto        : null,
+                image       : null
             },
+
         }
 
         this.subjectref = React.createRef()
@@ -137,7 +142,7 @@ class BankSoalContainer extends React.Component{
                         subject : (questions[i].subject === null )? "-" : questions[i].subject.name,
                         subject_id : (questions[i].subject === null )? null : questions[i].subject.id,
 
-                        image : questions[i].path_image,
+                        image : questions[i].image,
                         is_katex : questions[i].is_katex,
                         katek : <BlockMath math={questions[i].question} renderError={(error) => {
                             return <b>TeX Salah!: {error.name}</b>
@@ -292,7 +297,9 @@ class BankSoalContainer extends React.Component{
                 false_count : this.state.selectedRows[0].false_count,
                 katex_obj   : <BlockMath math={`${this.state.selectedRows[0].label}`} renderError={(error) => {
                     return <b>TeX Salah!: {error.name}</b>
-                }}/>
+                }}/>,
+                foto : null,
+                image: this.state.selectedRows[0].image
             }
         }, () =>{
 
@@ -322,6 +329,8 @@ class BankSoalContainer extends React.Component{
                 specific    : null,
                 is_katex    : 0,
                 answers     : [],
+                foto        : null,
+                image       : null
             }
         }, ()=>{
             this.subjectref.current.select.clearValue()
@@ -347,20 +356,33 @@ class BankSoalContainer extends React.Component{
             })
 
             const value = this.state.value
-            let valuex = {
-                passage_id : value.passage_id,
-                question   : value.description,
-                is_katex   : value.is_katex,
-                path_image : value.image,
-                answers    : value.answers,
-                specifics  : value.specific,
+
+            const formData  = new FormData()
+            if(value.foto !== null ){
+                formData.append("file", value.foto)
             }
 
+            formData.append("passage_id", value.passage_id)
+            formData.append("question", value.description)
+            formData.append("is_katex",value.is_katex)
+            formData.append("answers",JSON.stringify(value.answers))
+            formData.append("specifics",JSON.stringify(value.specific))
+
+            // let valuex = {
+            //     passage_id : value.passage_id,
+            //     question   : value.description,
+            //     is_katex   : value.is_katex,
+            //     path_image : value.image,
+            //     answers    : value.answers,
+            //     specifics  : value.specific,
+            // }
+
             axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-            axios.post("/admin/question/question/store",{
-                value:valuex
-            },
-            {withCredentials:true}).then((res)=>{
+            axios.post("/admin/question/question/store",formData,
+            {
+                withCredentials:true,
+                headers: {'Content-Type': 'multipart/form-data' }
+            }).then((res)=>{
                 this.setState({
                     addsubmitting:false,
                 })
@@ -388,23 +410,44 @@ class BankSoalContainer extends React.Component{
             })
 
             const value = this.state.value
-            let valuex = {
-                id         : value.id,
-                passage_id : value.passage_id,
-                question   : value.description,
-                is_katex   : value.is_katex,
-                path_image : value.image,
-                answers    : value.answers,
-                specifics  : value.specific,
-                true_count : value.true_count,
-                false_count: value.false_count,
+
+            const formData  = new FormData()
+            if(value.foto !== null ){
+                formData.append("file", value.foto)
+            }
+            
+            if(value.image !== null){
+                formData.append("prevfile", new Blob([value.image]), "previousImage.jpg")
             }
 
+            formData.append("deleteImage", this.state.modaldeletefoto === true?1:0)
+            formData.append("id",value.id)
+            formData.append("passage_id", value.passage_id)
+            formData.append("question", value.description)
+            formData.append("is_katex",value.is_katex)
+            formData.append("answers",JSON.stringify(value.answers))
+            formData.append("specifics",JSON.stringify(value.specific))
+            formData.append("true_count",value.true_count)
+            formData.append("false_count", value.false_count)
+
+            // let valuex = {
+            //     id         : value.id,
+            //     passage_id : value.passage_id,
+            //     question   : value.description,
+            //     is_katex   : value.is_katex,
+            //     path_image : value.image,
+            //     answers    : value.answers,
+            //     specifics  : value.specific,
+            //     true_count : value.true_count,
+            //     false_count: value.false_count,
+            // }
+
             axios.defaults.headers.common['Authorization'] = `Bearer ${this.props.fakeAuth.data.user.token}` 
-            axios.post("/admin/question/question/update",{
-                value:valuex
-            },
-            {withCredentials:true}).then((res)=>{
+            axios.post("/admin/question/question/update",formData,
+            {
+                withCredentials:true,
+                headers: {'Content-Type': 'multipart/form-data' }
+            }).then((res)=>{
                 this.setState({
                     addsubmitting:false,
                 })
@@ -705,6 +748,15 @@ class BankSoalContainer extends React.Component{
         })
     }
 
+    onFotoChange = (event)=>{
+        const value = this.state.value
+        value.foto  = event.target.files[0]
+
+        this.setState({
+            value : value
+        })
+    }
+
     render(){
         const home = <div className="admin-content-container">
                         <div className="admin-content-header">
@@ -818,7 +870,6 @@ class BankSoalContainer extends React.Component{
             </div>
             <div className="form-group row">
                 <div className="col-3">
-
                 </div>
                 <div className="col-9">
                     <label htmlFor="is_katex">
@@ -826,6 +877,29 @@ class BankSoalContainer extends React.Component{
                     </label>
                 </div>
             </div>
+            <div className="form-group row">
+                <div className="col-3">
+                        <label htmlFor="" className="control-label">Foto</label>
+                </div>
+                <div className="col-9">
+                    <input type="file" className="form-control" onChange={this.onFotoChange}/>
+                </div> 
+            </div>
+            {
+                (this.state.value.image !== null)?
+                    <div className="form-group row">
+                        <div className="col-3">
+                            {(this.state.modaldeletefoto===true)?<button className="btn btn-outline-success btn-sm" onClick={()=>this.setState({modaldeletefoto:false})}>Batal Hapus</button> :<button className="btn btn-outline-danger btn-sm" onClick={()=>this.setState({modaldeletefoto:true})}>Hapus Gambar</button>}
+                            
+                        </div>
+                        <div className="col-9">
+                            {(this.state.modaldeletefoto===false)?<img style={{ display:"block",width:"100%" }} src={'data:image/jpeg;base64,' + btoa(new Uint8Array(this.state.value.image.data).reduce((data,byte)=> {return data+ String.fromCharCode(byte)},''))} alt=""/>:""}
+                            
+                        </div>
+                    </div>:
+                    ""
+            }
+
             {(this.state.value.is_katex === true || this.state.value.is_katex ===1)? <div className="form-group">
                 <div className="col-3">
                 </div>

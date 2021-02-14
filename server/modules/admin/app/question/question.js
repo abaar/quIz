@@ -1,5 +1,6 @@
 const path  = require('path')
-
+const formidable  = require("formidable")
+const fs = require("fs");
 const repo         = require("../../../../repository/questionRepository.js")
 const repoSpecific = require("../../../../repository/specificCompetencyRepository.js")
 const repoBase     = require("../../../../repository/baseCompetencyRepository.js")
@@ -17,6 +18,12 @@ const SpecificCompetency = require("../../../../models/specificCompetency.js")
 const Question = require("../../../../models/questions")
 const QuestionAnswers   = require("../../../../models/questionAnswers");
 const QuestionSpecificCompetency = require('../../../../models/questionSpecificCompetencies.js')
+
+function readImageFile(file) {
+    const bitmap = fs.readFileSync(file);
+    const buffer = Buffer.from(bitmap)
+    return buffer;
+}
 
 exports.all = (req, res)=>{
     try{
@@ -104,7 +111,6 @@ exports.all = (req, res)=>{
 
             for (let i =0 ; i < questions.length; ++i){
                 for (let j =0 ; j < questions[i].specificCompetencies.length; ++j){
-                    console.log(questions[i])
                     questions[i].specificCompetencies[j].specificCompetency = specificCompetency_obj[questions[i].specificCompetencies[j].specific_id]
                     questions[i].subject = specificCompetency_obj[questions[i].specificCompetencies[j].specific_id].subject
                 }
@@ -128,49 +134,59 @@ exports.all = (req, res)=>{
 
 exports.store = (req, res) =>{
     try{
-        const { value } = req.body
+        const formData = formidable.IncomingForm()
+        new Promise((resolve,reject)=>{
+            formData.parse(req, function(err, fields, files){
+                let soal_image = null;
+                if("file" in files){
+                    soal_image = readImageFile(files.file.path);
+                }
+                if(fields.question.length === 0 || fields.question === null || fields.question === "undefined"){
+                }else if(fields.answers.length === 0 || fields.answers.length === null  || fields.answers === "undefined"){
+                    res.send({
+                        status  : false,
+                        message : "Minimal ada 1 pilihan jawaban!"
+                    })
+                    return
+                }
+                const question = new Question(null,fields.question, 0, 0, null, (fields.passage_id === "undefined" || fields.passage_id.length === 0)? null:fields.passage_id, soal_image, fields.is_katex)
+                const answers  = JSON.parse(fields.answers)
+                const specifics= JSON.parse(fields.specifics)
 
+                for(let i =0 ; i < answers.length; ++i){
+                    question.addAnswer(new QuestionAnswers(null, null, answers[i].label, answers[i].is_correct))
+                }
 
-        if(value.question.length === 0 || value.question === null){
-            res.send({
-                status  : false,
-                message : "Soal tidak boleh kosong!"
-            })
-            return
-        }else if(value.answers.length === 0 || value.answers.length === null ){
-            res.send({
-                status  : false,
-                message : "Minimal ada 1 pilihan jawaban!"
-            })
-            return
-        }
+                for (let i =0; i < specifics.length; ++i){
+                    question.addSpecificCompetency(new QuestionSpecificCompetency(null, null, specifics[i].value))
+                }
 
-        const question = new Question(null,value.question, 0, 0, null, value.passage_id, value.path_image, value.is_katex)
-
-        for(let i =0 ; i < value.answers.length; ++i){
-            question.addAnswer(new QuestionAnswers(null, null, value.answers[i].label, value.answers[i].is_correct))
-        }
-
-        for (let i =0; i < value.specifics.length; ++i){
-            question.addSpecificCompetency(new QuestionSpecificCompetency(null, null, value.specifics[i].value))
-        }
-
-        repo.store(question).then((result)=>{
-            if(result){
-                res.send({
-                    status  : true,
-                    message : "Berhasil menambahkan data!"
+                resolve({
+                    status: true,
+                    data  : question
                 })
-            }else{
-
-                res.send({
-                    status  : false,
-                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+            })
+        }).then((result)=>{
+            if(result.status){
+                const question = result.data
+                repo.store(question).then((result)=>{
+                    if(result){
+                        res.send({
+                            status  : true,
+                            message : "Berhasil menambahkan data!"
+                        })
+                    }else{
+                        res.send({
+                            status  : false,
+                            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                        })
+                    }
                 })
             }
         })
 
     }catch(err){
+        console.log(err)
         res.send({
             status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
@@ -180,56 +196,122 @@ exports.store = (req, res) =>{
 
 exports.update = (req, res) => {
     try{
-        const { value } = req.body
+        const formData = formidable.IncomingForm()
+        new Promise((resolve,reject)=>{
+            formData.parse(req, function(err, fields, files){
+                
+                let soal_image = null;
+                if("previmage" in files){
+                    soal_image = readImageFile(files.previmage.path);
+                    if(parseInt(fields.deleteImage) === 1){
+                        soal_image = null
+                    }
+                }
 
-        if(value.question.length === 0 || value.question === null){
-            res.send({
-                status  : false,
-                message : "Soal tidak boleh kosong!"
-            })
-            return
-        }else if(value.answers.length === 0 || value.answers.length === null ){
-            res.send({
-                status  : false,
-                message : "Minimal ada 1 pilihan jawaban!"
-            })
-            return
-        } 
+                if("file" in files){
+                    soal_image = readImageFile(files.file.path);
+                }
 
+                if(fields.question.length === 0 || fields.question === null || fields.question === "undefined"){
+                }else if(fields.answers.length === 0 || fields.answers.length === null  || fields.answers === "undefined"){
+                    res.send({
+                        status  : false,
+                        message : "Minimal ada 1 pilihan jawaban!"
+                    })
+                    return
+                }
+                const question = new Question(fields.id,fields.question, 0, 0, null, (fields.passage_id === "undefined" || fields.passage_id.length === 0)? null:fields.passage_id, soal_image, fields.is_katex)
+                const answers  = JSON.parse(fields.answers)
+                const specifics= JSON.parse(fields.specifics)
 
-        const question = new Question(value.id,value.question, value.true_count, value.false_count, null, value.passage_id, value.path_image, value.is_katex)
+                for(let i =0 ; i < answers.length; ++i){
+                    question.addAnswer(new QuestionAnswers(null, null, answers[i].label, answers[i].is_correct))
+                }
 
-        for(let i =0 ; i < value.answers.length; ++i){
-            question.addAnswer(new QuestionAnswers(value.answers[i].id,value.id, value.answers[i].label, value.answers[i].is_correct))
-        }
+                for (let i =0; i < specifics.length; ++i){
+                    question.addSpecificCompetency(new QuestionSpecificCompetency(null, null, specifics[i].value))
+                }
 
-        for (let i =0; i < value.specifics.length; ++i){
-            question.addSpecificCompetency(new QuestionSpecificCompetency(value.specifics[i].id, value.id, value.specifics[i].value))
-        }
-
-        console.log(question)
-
-
-        repo.update(question).then((result)=>{
-            if(result){
-                res.send({
-                    status  : true,
-                    message : "Berhasil menambahkan data!"
+                resolve({
+                    status: true,
+                    data  : question
                 })
-            }else{
+            })
+        }).then((result)=>{
+            if(result.status){
+                const question = result.data
+                repo.update(question).then((result)=>{
+                    if(result){
+                        res.send({
+                            status  : true,
+                            message : "Berhasil menambahkan data!"
+                        })
+                    }else{
 
-                res.send({
-                    status  : false,
-                    message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                        res.send({
+                            status  : false,
+                            message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+                        })
+                    }
                 })
             }
         })
+
     }catch(err){
         res.send({
             status  : false,
             message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
         })
     }
+    // try{
+    //     const { value } = req.body
+
+    //     if(value.question.length === 0 || value.question === null){
+    //         res.send({
+    //             status  : false,
+    //             message : "Soal tidak boleh kosong!"
+    //         })
+    //         return
+    //     }else if(value.answers.length === 0 || value.answers.length === null ){
+    //         res.send({
+    //             status  : false,
+    //             message : "Minimal ada 1 pilihan jawaban!"
+    //         })
+    //         return
+    //     } 
+
+
+    //     const question = new Question(value.id,value.question, value.true_count, value.false_count, null, value.passage_id, value.image, value.is_katex)
+
+    //     for(let i =0 ; i < value.answers.length; ++i){
+    //         question.addAnswer(new QuestionAnswers(value.answers[i].id,value.id, value.answers[i].label, value.answers[i].is_correct))
+    //     }
+
+    //     for (let i =0; i < value.specifics.length; ++i){
+    //         question.addSpecificCompetency(new QuestionSpecificCompetency(value.specifics[i].id, value.id, value.specifics[i].value))
+    //     }
+
+
+    //     repo.update(question).then((result)=>{
+    //         if(result){
+    //             res.send({
+    //                 status  : true,
+    //                 message : "Berhasil menambahkan data!"
+    //             })
+    //         }else{
+
+    //             res.send({
+    //                 status  : false,
+    //                 message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+    //             })
+    //         }
+    //     })
+    // }catch(err){
+    //     res.send({
+    //         status  : false,
+    //         message : "Terjadi kesalahan sistem, mohon menghubungi Admin!"
+    //     })
+    // }
 }
 
 exports.destroy = (req, res) =>{
