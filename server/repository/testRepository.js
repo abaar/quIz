@@ -191,7 +191,9 @@ exports.destroy  = testRepository.destroy
 exports.getById = (id, withQuestionId = false, withTestTaker = false) => {
     return new Promise((resolve, reject) =>{
         db.getConnection((err,connection) =>{
-            if(err) throw err;
+            if(err) {
+                return resolve(false)
+            };
 
             let sql;
             if(withQuestionId === true && withTestTaker  === true){
@@ -263,11 +265,15 @@ exports.getByUser = (user) => {
     return new Promise((resolve, reject) =>{
         try{
             db.getConnection((err,connection) =>{
-                if(err) throw err;
+                if(err) {
+                    return resolve(false)
+                }
                 let sql = "SELECT tests.* , test_takers.start as tstart , test_takers.end as tend, test_takers.score as tscore FROM tests LEFT JOIN test_takers on tests.id = test_takers.test_id  AND test_takers.user_id = ? WHERE (date >= curdate() and (test_takers.user_id = ? OR (subclass_id is not null and subclass_id = ?) or (class_id is not null and class_id = ?) or (school_id is not null and school_id = ?))) or (date is null)  ORDER BY tests.type ASC, !ISNULL(tend)";
-                try{
                     connection.query(sql, [user.id , user.id, user.subclass_id , user.class_id , user.school_id], (err,result)=>{
-                        if(err) throw(err)
+                        if(err) {
+                            connection.release()
+                            return resolve(false)
+                        }
                         
                         if(!result){
                             result = []
@@ -284,12 +290,9 @@ exports.getByUser = (user) => {
                         connection.release()
                         return resolve(holder);
                     });
-                }catch(err){
-                    throw err;
-                }
             });
         }catch(err){
-            throw(err)
+            resolve(false)
         }
     });
 }
@@ -299,7 +302,7 @@ exports.getQuestionIds = (id) => {
         try{
             db.getConnection((err,connection) => {
                 if(err){
-                    throw err
+                    return resolve(false)
                 }
 
                 let sql = "SELECT question_id FROM test_questions WHERE test_id = ?"
@@ -318,7 +321,7 @@ exports.getQuestionIds = (id) => {
                 })
             })
         }catch(err){
-            throw err
+            resolve(false)
         }
     })
 }

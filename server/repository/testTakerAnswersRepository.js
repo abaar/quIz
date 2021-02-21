@@ -28,8 +28,10 @@ exports.getByTestTaker = (testtaker) =>{
             const sql = "SELECT * FROM test_taker_answers WHERE user_id = ? AND test_id = ?"
 
             conn.query(sql, [testtaker.user_id, testtaker.test_id], (err,res) => {
-                if(err)
-                    throw(err)
+                if(err){
+                    conn.release()
+                    return resolve(false)
+                }
 
                 let finalresult = []
 
@@ -50,8 +52,10 @@ exports.sumOfCorrectAnswers = (testtaker) => {
             const sql = "SELECT user_id, test_id, sum(is_correct) as correct_total FROM test_taker_answers WHERE user_id = ? AND test_id = ? GROUP BY (test_id) LIMIT 1"
 
             conn.query(sql, [testtaker.user_id, testtaker.test_id], (err,res) => {
-                if(err)
-                    throw(err)
+                if(err){
+                    conn.release()
+                    return resolve(false)
+                }
 
                 if(res.length > 0)
                     res = res[0]
@@ -69,8 +73,10 @@ exports.deletedSumOfTest = (testtaker) =>{
             const sql = "SELECT user_id, test_id, question_id , SUM(time_needed_in_seconds) AS time_total FROM test_taker_answers_deleted WHERE user_id = ? AND test_id = ? GROUP BY (question_id)"
             
             conn.query(sql, [testtaker.user_id , testtaker.test_id], (err, res)=>{
-                if(err)
-                    throw(err)
+                if(err){
+                    conn.release()
+                    return resolve(false)
+                }
                 
                 let finalresult = {}
 
@@ -78,8 +84,8 @@ exports.deletedSumOfTest = (testtaker) =>{
                     finalresult[res[i].question_id] = res[i].time_total
                 }
 
-                return resolve(finalresult)
                 conn.release()
+                return resolve(finalresult)
             })
         })
     })
