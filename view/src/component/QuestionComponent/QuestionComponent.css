@@ -9,4 +9,17 @@
 .q-question-container{
     margin-top:30px;
     padding-left: 20px;
+    margin-bottom: 70px;
+}
+
+.q-question-image{
+    width: 400px;
+}
+
+
+@media only screen and (max-width: 600px) {
+    .q-question-image{
+        width: 70%;
+    }
+    
 }

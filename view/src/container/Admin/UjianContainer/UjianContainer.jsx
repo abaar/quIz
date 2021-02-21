@@ -24,8 +24,9 @@ const columnSoal = [
       cell: row => <div data-tag="allowRowEvents">{(row.is_katex === 1? row.katek:row.label)}</div>,
     },
     {
-      name : "Komponen Foto",
-      cell : row => <div data-tag="allowRowEvents">{(row.image === null)? "-": <img src={row.image} alt={"Soal " + row.label}/>}</div>
+        name : "Komponen Foto",
+        // https://medium.com/@koteswar.meesala/convert-array-buffer-to-base64-string-to-display-images-in-angular-7-4c443db242cd 
+        cell : row => <div data-tag="allowRowEvents">{(row.image === null)? "-": <img width="100px" src={'data:image/jpeg;base64,' + btoa(new Uint8Array(row.image.data).reduce((data,byte)=> {return data+ String.fromCharCode(byte)},''))} alt={"Soal " + row.label}/>}</div>
     },
   ];
 
@@ -865,7 +866,7 @@ class UjianContainer extends React.Component{
                 _datas.push({
                     index : (i+1),
                     id : questions[i].id,
-                    image : questions[i].path_image,
+                    image : questions[i].image,
                     is_katex : questions[i].is_katex,
                     katek : <BlockMath math={questions[i].question} renderError={(error) => {
                         return <b>TeX Salah!: {error.name}</b>
@@ -1052,7 +1053,7 @@ class UjianContainer extends React.Component{
                 </div>
             </div>
         </span>
-                
+        
         const kelolaSoal = <span>
             {(this.state.loadingSoal === true)? "Loading...":
                 <TableComponent setSearch={()=>console.log("search")} pagination={false} preselect={rowSelectCritera} onSelectedRowsHandler={this.onKelolaSoalChecked} data={this.state.kelolaSoals_} cols={columnSoal} expandableRows={true} expandableRowsComponent={<ExpandableSoalComponent/>} title="Daftar Soal" />

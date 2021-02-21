@@ -76,6 +76,7 @@ exports.all = (req, res)=>{
                 school_obj[class_obj[key[i]].school_id].addClass(class_obj[key[i]])
             }
 
+
             for (let i = 0 ; i < tests.length; ++i){
                 if(tests[i].subject_id !== null){
                     tests[i].setSubject(new Subject(tests[i].subject_id, subject_obj[tests[i].subject_id].name))
@@ -93,7 +94,7 @@ exports.all = (req, res)=>{
                     tests[i].class = new Class(tests[i].class_id, tests[i].school_id , class_obj[tests[i].class_id].name)
                 }
 
-                if(tests[i].class_id !== null){
+                if(tests[i].school_id !== null){
                     tests[i].school = new School(tests[i].school_id, school_obj[tests[i].school_id].name)
                 }
                 

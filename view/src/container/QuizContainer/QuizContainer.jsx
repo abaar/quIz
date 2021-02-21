@@ -27,6 +27,7 @@ class QuizContainer extends React.Component{
                 question    : iter.question,
                 checked     : iter.test_taker_answer,
                 answers     : [],
+                image       : iter.image
             }
             for(let j = 0 ; j < iter.answers.length; ++j){
                 let jter = iter.answers[j]

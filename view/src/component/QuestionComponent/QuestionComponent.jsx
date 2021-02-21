@@ -22,6 +22,9 @@ class QuestionComponent extends React.Component {
             <span>
                 <span className="q-number-container"> No {this.props.details.index+1}</span>
                 <div className="q-question-container"> 
+                    {(this.props.details.image === null)?"":
+                        <img style={{ float:"left", marginRight:"10px" }} src={'data:image/jpeg;base64,' + btoa(new Uint8Array(this.props.details.image.data).reduce((data,byte)=> {return data+ String.fromCharCode(byte)},''))} alt={"Soal " + this.props.details.label}/>
+                    }
                     <p className="q-question" >{this.props.details.question}</p>
                     {answers}
                 </div>
