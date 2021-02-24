@@ -109,25 +109,4 @@ module.exports = class Test{
     getQuestionLen = () =>{
         return (this.question_ids.length > this.questions.length)? this.question_ids.length : this.questions.length
     }
-    
-    addLog = (logs) =>{
-        this.logs.push(logs)
-    }
-
-    delLog  = (logs) =>{
-        for(let i =0 ; i < this.logs.length ; ++i){
-            if(this.logs[i].id == logs.id){
-                this.logs.splice(i , 1)
-                return
-            }
-        }
-    }
-
-    clearLogs = () =>{
-        this.logs = []
-    }
-
-    getLogs = () =>{
-        return this.logs
-    }
 }

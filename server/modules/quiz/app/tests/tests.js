@@ -183,7 +183,37 @@ exports.start = (req, res) =>{
                             })
                         }else{
                             repoQuestion.getQuestionByTest(test,id).then((questions)=>{
-                                test.questions = questions
+                                qholder = questions
+                                if(test.randomquestion !== null && (parseInt(test.randomquestion) === 1 || test.randomquestion === true)){
+                                    let index = questions.length;
+                                    let tempvalue;
+                                    while(0 !== index){
+                                        const randomIndx = Math.floor(Math.random() * index )
+                                        index = index - 1
+        
+                                        tempvalue = qholder[index]
+                                        qholder[index] = qholder[randomIndx]
+                                        qholder[randomIndx] = tempvalue
+                                    }
+                                }
+                                
+                                if(test.randomanswers !== null && (parseInt(test.randomquestion) === 1 || test.randomquestion === true)){
+                                    for(let i = 0 ; i < qholder.length ; ++i){
+                                        let qindex = qholder[i].answers.length
+                                        let aholder = qholder[i].answers
+                                        let tempvalue;
+                                        while(qindex !== 0){
+                                            const randomIndex = Math.floor(Math.random() * qindex )
+                                            qindex = qindex - 1
+        
+                                            tempvalue = aholder[qindex]
+                                            aholder[qindex] = aholder[randomIndex]
+                                            aholder[randomIndex] = tempvalue
+                                        }
+                                        qholder[i].answers = aholder
+                                    }
+                                }
+                                test.questions = qholder
                                 test.start     = new Date()
                                 res.send({
                                     status : true,
@@ -251,7 +281,37 @@ exports.continue = (req, res) =>{
                     })
                 }else{
                     repoQuestion.getQuestionByTest(test, id).then((questions)=>{
-                        test.questions = questions
+                        qholder = questions
+                        if(test.randomquestion !== null && (parseInt(test.randomquestion) === 1 || test.randomquestion === true)){
+                            let index = questions.length;
+                            let tempvalue;
+                            while(0 !== index){
+                                const randomIndx = Math.floor(Math.random() * index )
+                                index = index - 1
+
+                                tempvalue = qholder[index]
+                                qholder[index] = qholder[randomIndx]
+                                qholder[randomIndx] = tempvalue
+                            }
+                        }
+                        
+                        if(test.randomanswers !== null && (parseInt(test.randomquestion) === 1 || test.randomquestion === true)){
+                            for(let i = 0 ; i < qholder.length ; ++i){
+                                let qindex = qholder[i].answers.length
+                                let aholder = qholder[i].answers
+                                let tempvalue;
+                                while(qindex !== 0){
+                                    const randomIndex = Math.floor(Math.random() * qindex )
+                                    qindex = qindex - 1
+
+                                    tempvalue = aholder[qindex]
+                                    aholder[qindex] = aholder[randomIndex]
+                                    aholder[randomIndex] = tempvalue
+                                }
+                                qholder[i].answers = aholder
+                            }
+                        }
+                        test.questions = qholder
                         test.start     = new Date()
                         res.send({
                             status : true,
